@@ -310,8 +310,8 @@
         <h1>Scegli il tuo Nibi e ricevi il Messaggio del Giorno</h1>
         <p>
           Avvicina il tuo telefono alla scultura Nibi o seleziona qui il tuo elemento.
-          Clicca su <strong>“Dammi il Messaggio del Giorno”</strong> per ricevere un responso intuitivo
-          con runa, senso, mantra e segni collegati.
+          Clicca su <strong>"Dammi il Messaggio del Giorno"</strong>:
+          si aprirà una finestra esterna con l'oracolo completo, stile Tina Örn.
         </p>
       </div>
 
@@ -345,13 +345,13 @@
 
       <div class="nibi-center" style="margin:10px 0 16px;">
         <div class="nibi-section-label">
-          2. Ricevi il responso di Nibi:
+          2. Apri l'oracolo Nibi:
         </div>
         <button id="nibi-oracle-button" onclick="chiediMessaggioNibi()">
           ✨ Dammi il Messaggio del Giorno
         </button>
         <div id="nibi-status">
-          In ascolto... Nibi raccoglie i frammenti di energia del momento.
+          Clicca sul pulsante: si aprirà l'Oracolo Nibi in una nuova scheda.
         </div>
       </div>
 
@@ -360,8 +360,8 @@
           Messaggio intuitivo di Nibi
         </div>
         <p>
-          Quando chiedi, Nibi risponde. Dopo aver toccato la scultura o selezionato il tuo elemento,
-          clicca sul pulsante per ricevere un responso unico per questo momento.
+          Dopo aver selezionato il tuo elemento, clicca sul pulsante dorato:
+          verrai portata all'oracolo completo su Cloud Run, con runa, senso, mantra e segni collegati.
         </p>
         <ul>
           <li><strong>Elemento:</strong> <span id="nibi-out-elemento">Fuoco</span></li>
@@ -386,18 +386,20 @@
 </div>
 
 <script>
-(function(){
-  // URL del backend Cloud Run che hai già: oracolo-nibi-web
+(function() {
+  // URL della versione HTML completa su Cloud Run
   const CLOUD_RUN_URL = "https://oracolo-nibi-web-207246221438.europe-west1.run.app";
   let elementoCorrente = "fuoco";
 
   function resetGlowButtons() {
     const buttons = document.querySelectorAll("#nibi-elementi button[data-elemento]");
-    buttons.forEach(b => {
+    buttons.forEach(function(b) {
       b.classList.remove("nibi-elemento-attivo");
       if (b.dataset.elemento !== "fuoco") {
         b.style.opacity = "0.82";
       }
+      b.style.boxShadow = "none";
+      b.style.transform = "translateY(0)";
     });
   }
 
@@ -407,80 +409,35 @@
     btn.classList.add("nibi-elemento-attivo");
     btn.style.opacity = "1";
 
-    const label = document.getElementById("nibi-selezionato-label");
+    var label = document.getElementById("nibi-selezionato-label");
     if (label) {
       label.innerHTML = "Nibi selezionato: <strong>" + btn.innerText.trim() + "</strong>";
     }
 
-    const outElem = document.getElementById("nibi-out-elemento");
+    var outElem = document.getElementById("nibi-out-elemento");
     if (outElem) {
-      const nameParts = (btn.innerText || "").split("–");
-      const shortName = (nameParts[0] || "").trim().replace(/^[^\\s]+\\s/, "") || elementoCorrente;
+      var nameParts = (btn.innerText || "").split("–");
+      var shortName = (nameParts[0] || "").trim().replace(/^[^\s]+\s/, "") || elementoCorrente;
       outElem.textContent = shortName;
     }
   };
 
-  window.chiediMessaggioNibi = async function() {
-    const statusEl = document.getElementById("nibi-status");
-    const btn = document.getElementById("nibi-oracle-button");
+  window.chiediMessaggioNibi = function() {
+    var statusEl = document.getElementById("nibi-status");
     if (statusEl) {
-      statusEl.textContent = "Nibi sta raccogliendo frammenti di futuro... ✨";
+      statusEl.textContent = "Sto aprendo l'Oracolo Nibi in una nuova scheda...";
       statusEl.style.color = "#ffe9ba";
     }
-    if (btn) {
-      btn.disabled = true;
-      btn.style.opacity = "0.7";
-      btn.style.cursor = "wait";
-    }
 
-    try {
-      const resp = await fetch(CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente));
-      if (!resp.ok) throw new Error("Risposta non valida dal server");
-      const data = await resp.json();
-
-      const elemento = data.elemento || elementoCorrente;
-      const runa = data.runa || data.runa_principale || "—";
-      const senso = data.senso || "—";
-      const mantra = data.mantra || "—";
-      const segni = Array.isArray(data.segni_zodiacali) ? data.segni_zodiacali.join(", ") : (data.segni_zodiacali || "—");
-      const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta. Ascolta cosa vibra nel tuo corpo dopo questa domanda.";
-
-      const outElem = document.getElementById("nibi-out-elemento");
-      const outRuna = document.getElementById("nibi-out-runa");
-      const outSenso = document.getElementById("nibi-out-senso");
-      const outMantra = document.getElementById("nibi-out-mantra");
-      const outSegni = document.getElementById("nibi-out-segni");
-      const outMsg = document.getElementById("nibi-out-messaggio");
-
-      if (outElem) outElem.textContent = elemento.charAt(0).toUpperCase() + elemento.slice(1);
-      if (outRuna) outRuna.textContent = runa;
-      if (outSenso) outSenso.textContent = senso;
-      if (outMantra) outMantra.textContent = mantra;
-      if (outSegni) outSegni.textContent = segni;
-      if (outMsg) outMsg.textContent = messaggio;
-
-      if (statusEl) {
-        statusEl.textContent = "Messaggio ricevuto. Se vuoi, torna domani per un nuovo responso.";
-        statusEl.style.color = "#c9d0ff";
-      }
-    } catch (err) {
-      console.error(err);
-      if (statusEl) {
-        statusEl.textContent = "Non riesco a contattare Nibi in questo momento. Riprova tra poco.";
-        statusEl.style.color = "#ff8a8a";
-      }
-    } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
-      }
-    }
+    var url = CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente);
+    window.open(url, "_blank");
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const first = document.querySelector("#nibi-elementi button[data-elemento='fuoco']");
-    if (first) window.selezionaNibi(first);
+  document.addEventListener("DOMContentLoaded", function() {
+    var first = document.querySelector("#nibi-elementi button[data-elemento='fuoco']");
+    if (first) {
+      window.selezionaNibi(first);
+    }
   });
 })();
 </script>
