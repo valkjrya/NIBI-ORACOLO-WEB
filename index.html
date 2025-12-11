@@ -420,10 +420,60 @@
     }
   };
 
+  // Fallback locale se Cloud Run non risponde
+  function generaFallback(elemento) {
+    const base = (elemento || "fuoco").toLowerCase();
+    const map = {
+      fuoco: {
+        runa: "ᛃ Jera",
+        senso: "Vista interiore",
+        mantra: "Lascio che il fuoco trasformi ciò che non mi serve più.",
+        segni: "Ariete, Leone, Sagittario",
+        msg: "Il tuo fuoco oggi chiede spazio. Non soffocarlo con i dubbi: scegli un’azione piccola ma coraggiosa e onora la tua fiamma."
+      },
+      acqua: {
+        runa: "ᚢ Uruz",
+        senso: "Tattilità / Pelle",
+        mantra: "Mi lascio attraversare dalle emozioni senza affogare in esse.",
+        segni: "Cancro, Scorpione, Pesci",
+        msg: "Qualcosa si sta sciogliendo dentro di te. Non trattenere le lacrime, i sospiri, i sospesi: lascia che l’acqua porti via la stanchezza."
+      },
+      aria: {
+        runa: "ᛉ Algiz",
+        senso: "Respiro",
+        mantra: "Ogni respiro crea spazio per una nuova possibilità.",
+        segni: "Gemelli, Bilancia, Acquario",
+        msg: "La mente corre, ma oggi hai il permesso di rallentare. Un respiro profondo può cambiare la forma dei pensieri."
+      },
+      terra: {
+        runa: "ᛃ Jera",
+        senso: "Olfatto / Radici",
+        mantra: "Sono radicata nel presente, anche quando tutto cambia.",
+        segni: "Toro, Vergine, Capricorno",
+        msg: "Le tue radici stanno cercando un terreno più fertile. Nutriti con gesti semplici, concreti, gentili verso il tuo corpo."
+      },
+      spazio: {
+        runa: "ᛈ Perthro",
+        senso: "Sesto senso",
+        mantra: "Mi fido dei segni sottili che l’Universo mi manda.",
+        segni: "Tutti i segni",
+        msg: "Una coincidenza ti sta parlando. Oggi nota il dettaglio che si ripete: numero, parola, simbolo. È un messaggio per te."
+      }
+    };
+    const d = map[base] || map.fuoco;
+    return {
+      elemento: base.charAt(0).toUpperCase() + base.slice(1),
+      runa: d.runa,
+      senso: d.senso,
+      mantra: d.mantra,
+      segni_zodiacali: d.segni,
+      messaggio: d.msg
+    };
+  }
+
   // Funzione per far parlare Nibi usando la voce del telefono
   function parlaTesto(testo) {
     if (!("speechSynthesis" in window)) {
-      // Nessun supporto vocale, non facciamo nulla
       return;
     }
     try {
@@ -451,59 +501,67 @@
       btn.style.cursor = "wait";
     }
 
+    let data = null;
+
     try {
       const resp = await fetch(CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente));
-      if (!resp.ok) throw new Error("Risposta non valida dal server");
-      const data = await resp.json();
+      if (resp.ok) {
+        data = await resp.json();
+      }
+    } catch (err) {
+      console.warn("Impossibile contattare Cloud Run, uso fallback locale.", err);
+    }
 
-      const elemento = data.elemento || elementoCorrente;
-      const runa = data.runa || data.runa_principale || "—";
-      const senso = data.senso || "—";
-      const mantra = data.mantra || "—";
-      const segni = Array.isArray(data.segni_zodiacali) ? data.segni_zodiacali.join(", ") : (data.segni_zodiacali || "—");
-      const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta. Ascolta cosa vibra nel tuo corpo dopo questa domanda.";
-
-      const outElem = document.getElementById("nibi-out-elemento");
-      const outRuna = document.getElementById("nibi-out-runa");
-      const outSenso = document.getElementById("nibi-out-senso");
-      const outMantra = document.getElementById("nibi-out-mantra");
-      const outSegni = document.getElementById("nibi-out-segni");
-      const outMsg = document.getElementById("nibi-out-messaggio");
-
-      if (outElem) outElem.textContent = elemento.charAt(0).toUpperCase() + elemento.slice(1);
-      if (outRuna) outRuna.textContent = runa;
-      if (outSenso) outSenso.textContent = senso;
-      if (outMantra) outMantra.textContent = mantra;
-      if (outSegni) outSegni.textContent = segni;
-      if (outMsg) outMsg.textContent = messaggio;
-
+    // Se Cloud Run non risponde, usiamo un messaggio locale
+    if (!data) {
+      data = generaFallback(elementoCorrente);
+      if (statusEl) {
+        statusEl.textContent = "Oggi Nibi ti parla da dentro la scultura, senza rete. ✨";
+        statusEl.style.color = "#c9d0ff";
+      }
+    } else {
       if (statusEl) {
         statusEl.textContent = "Messaggio ricevuto. Se vuoi, ascolta la voce di Nibi o torna domani per un nuovo responso.";
         statusEl.style.color = "#c9d0ff";
       }
+    }
 
-      // Costruisco la frase che Nibi pronuncia
-      const testoVocale =
-        "Elemento: " + elemento + ". " +
-        (runa !== "—" ? "Runa: " + runa + ". " : "") +
-        (senso !== "—" ? "Senso: " + senso + ". " : "") +
-        (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
-        "Messaggio del giorno: " + messaggio;
+    const elemento = data.elemento || elementoCorrente;
+    const runa = data.runa || data.runa_principale || "—";
+    const senso = data.senso || "—";
+    const mantra = data.mantra || "—";
+    const segni = Array.isArray(data.segni_zodiacali)
+      ? data.segni_zodiacali.join(", ")
+      : (data.segni_zodiacali || "—");
+    const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta. Ascolta cosa vibra nel tuo corpo dopo questa domanda.";
 
-      parlaTesto(testoVocale);
+    const outElem = document.getElementById("nibi-out-elemento");
+    const outRuna = document.getElementById("nibi-out-runa");
+    const outSenso = document.getElementById("nibi-out-senso");
+    const outMantra = document.getElementById("nibi-out-mantra");
+    const outSegni = document.getElementById("nibi-out-segni");
+    const outMsg = document.getElementById("nibi-out-messaggio");
 
-    } catch (err) {
-      console.error(err);
-      if (statusEl) {
-        statusEl.textContent = "Non riesco a contattare Nibi in questo momento. Riprova tra poco.";
-        statusEl.style.color = "#ff8a8a";
-      }
-    } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
-      }
+    if (outElem) outElem.textContent = elemento.charAt(0).toUpperCase() + elemento.slice(1);
+    if (outRuna) outRuna.textContent = runa;
+    if (outSenso) outSenso.textContent = senso;
+    if (outMantra) outMantra.textContent = mantra;
+    if (outSegni) outSegni.textContent = segni;
+    if (outMsg) outMsg.textContent = messaggio;
+
+    const testoVocale =
+      "Elemento: " + elemento + ". " +
+      (runa !== "—" ? "Runa: " + runa + ". " : "") +
+      (senso !== "—" ? "Senso: " + senso + ". " : "") +
+      (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
+      "Messaggio del giorno: " + messaggio;
+
+    parlaTesto(testoVocale);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     }
   };
 
