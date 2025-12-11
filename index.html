@@ -310,8 +310,8 @@
         <h1>Scegli il tuo Nibi e ricevi il Messaggio del Giorno</h1>
         <p>
           Avvicina il tuo telefono alla scultura Nibi o seleziona qui il tuo elemento.
-          Clicca su <strong>"Dammi il Messaggio del Giorno"</strong>:
-          si aprirà una finestra esterna con l'oracolo completo, stile Tina Örn.
+          Clicca su <strong>“Dammi il Messaggio del Giorno”</strong> per ricevere un responso intuitivo
+          con runa, senso, mantra e segni collegati. Se il tuo telefono lo supporta, Nibi ti parlerà anche a voce.
         </p>
       </div>
 
@@ -345,13 +345,13 @@
 
       <div class="nibi-center" style="margin:10px 0 16px;">
         <div class="nibi-section-label">
-          2. Apri l'oracolo Nibi:
+          2. Ricevi il responso di Nibi:
         </div>
         <button id="nibi-oracle-button" onclick="chiediMessaggioNibi()">
           ✨ Dammi il Messaggio del Giorno
         </button>
         <div id="nibi-status">
-          Clicca sul pulsante: si aprirà l'Oracolo Nibi in una nuova scheda.
+          In ascolto... Nibi raccoglie i frammenti di energia del momento.
         </div>
       </div>
 
@@ -360,8 +360,8 @@
           Messaggio intuitivo di Nibi
         </div>
         <p>
-          Dopo aver selezionato il tuo elemento, clicca sul pulsante dorato:
-          verrai portata all'oracolo completo su Cloud Run, con runa, senso, mantra e segni collegati.
+          Quando chiedi, Nibi risponde. Dopo aver toccato la scultura o selezionato il tuo elemento,
+          clicca sul pulsante per ricevere un responso unico per questo momento.
         </p>
         <ul>
           <li><strong>Elemento:</strong> <span id="nibi-out-elemento">Fuoco</span></li>
@@ -386,20 +386,18 @@
 </div>
 
 <script>
-(function() {
-  // URL della versione HTML completa su Cloud Run
+(function(){
+  // URL del backend Cloud Run (JSON)
   const CLOUD_RUN_URL = "https://oracolo-nibi-web-207246221438.europe-west1.run.app";
   let elementoCorrente = "fuoco";
 
   function resetGlowButtons() {
     const buttons = document.querySelectorAll("#nibi-elementi button[data-elemento]");
-    buttons.forEach(function(b) {
+    buttons.forEach(b => {
       b.classList.remove("nibi-elemento-attivo");
       if (b.dataset.elemento !== "fuoco") {
         b.style.opacity = "0.82";
       }
-      b.style.boxShadow = "none";
-      b.style.transform = "translateY(0)";
     });
   }
 
@@ -409,35 +407,109 @@
     btn.classList.add("nibi-elemento-attivo");
     btn.style.opacity = "1";
 
-    var label = document.getElementById("nibi-selezionato-label");
+    const label = document.getElementById("nibi-selezionato-label");
     if (label) {
       label.innerHTML = "Nibi selezionato: <strong>" + btn.innerText.trim() + "</strong>";
     }
 
-    var outElem = document.getElementById("nibi-out-elemento");
+    const outElem = document.getElementById("nibi-out-elemento");
     if (outElem) {
-      var nameParts = (btn.innerText || "").split("–");
-      var shortName = (nameParts[0] || "").trim().replace(/^[^\s]+\s/, "") || elementoCorrente;
+      const nameParts = (btn.innerText || "").split("–");
+      const shortName = (nameParts[0] || "").trim().replace(/^[^\s]+\s/, "") || elementoCorrente;
       outElem.textContent = shortName;
     }
   };
 
-  window.chiediMessaggioNibi = function() {
-    var statusEl = document.getElementById("nibi-status");
+  // Funzione per far parlare Nibi usando la voce del telefono
+  function parlaTesto(testo) {
+    if (!("speechSynthesis" in window)) {
+      // Nessun supporto vocale, non facciamo nulla
+      return;
+    }
+    try {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(testo);
+      utter.lang = "it-IT";
+      utter.rate = 1;
+      utter.pitch = 1;
+      window.speechSynthesis.speak(utter);
+    } catch (e) {
+      console.warn("Problema con la sintesi vocale:", e);
+    }
+  }
+
+  window.chiediMessaggioNibi = async function() {
+    const statusEl = document.getElementById("nibi-status");
+    const btn = document.getElementById("nibi-oracle-button");
     if (statusEl) {
-      statusEl.textContent = "Sto aprendo l'Oracolo Nibi in una nuova scheda...";
+      statusEl.textContent = "Nibi sta raccogliendo frammenti di futuro... ✨";
       statusEl.style.color = "#ffe9ba";
     }
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+      btn.style.cursor = "wait";
+    }
 
-    var url = CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente);
-    window.open(url, "_blank");
+    try {
+      const resp = await fetch(CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente));
+      if (!resp.ok) throw new Error("Risposta non valida dal server");
+      const data = await resp.json();
+
+      const elemento = data.elemento || elementoCorrente;
+      const runa = data.runa || data.runa_principale || "—";
+      const senso = data.senso || "—";
+      const mantra = data.mantra || "—";
+      const segni = Array.isArray(data.segni_zodiacali) ? data.segni_zodiacali.join(", ") : (data.segni_zodiacali || "—");
+      const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta. Ascolta cosa vibra nel tuo corpo dopo questa domanda.";
+
+      const outElem = document.getElementById("nibi-out-elemento");
+      const outRuna = document.getElementById("nibi-out-runa");
+      const outSenso = document.getElementById("nibi-out-senso");
+      const outMantra = document.getElementById("nibi-out-mantra");
+      const outSegni = document.getElementById("nibi-out-segni");
+      const outMsg = document.getElementById("nibi-out-messaggio");
+
+      if (outElem) outElem.textContent = elemento.charAt(0).toUpperCase() + elemento.slice(1);
+      if (outRuna) outRuna.textContent = runa;
+      if (outSenso) outSenso.textContent = senso;
+      if (outMantra) outMantra.textContent = mantra;
+      if (outSegni) outSegni.textContent = segni;
+      if (outMsg) outMsg.textContent = messaggio;
+
+      if (statusEl) {
+        statusEl.textContent = "Messaggio ricevuto. Se vuoi, ascolta la voce di Nibi o torna domani per un nuovo responso.";
+        statusEl.style.color = "#c9d0ff";
+      }
+
+      // Costruisco la frase che Nibi pronuncia
+      const testoVocale =
+        "Elemento: " + elemento + ". " +
+        (runa !== "—" ? "Runa: " + runa + ". " : "") +
+        (senso !== "—" ? "Senso: " + senso + ". " : "") +
+        (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
+        "Messaggio del giorno: " + messaggio;
+
+      parlaTesto(testoVocale);
+
+    } catch (err) {
+      console.error(err);
+      if (statusEl) {
+        statusEl.textContent = "Non riesco a contattare Nibi in questo momento. Riprova tra poco.";
+        statusEl.style.color = "#ff8a8a";
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+      }
+    }
   };
 
-  document.addEventListener("DOMContentLoaded", function() {
-    var first = document.querySelector("#nibi-elementi button[data-elemento='fuoco']");
-    if (first) {
-      window.selezionaNibi(first);
-    }
+  document.addEventListener("DOMContentLoaded", () => {
+    const first = document.querySelector("#nibi-elementi button[data-elemento='fuoco']");
+    if (first) window.selezionaNibi(first);
   });
 })();
 </script>
