@@ -71,7 +71,6 @@
     }
 
     .nibi-inner { position: relative; z-index: 1; }
-
     .nibi-header { text-align: center; margin-bottom: 18px; }
 
     .nibi-eyebrow {
@@ -326,7 +325,6 @@
 
     const outElem = document.getElementById("nibi-out-elemento");
     if (outElem) {
-      // Mostro “Fuoco/Acqua/Aria/Terra/Spazio” in modo stabile (no parsing fragile)
       const pretty = elementoCorrente.charAt(0).toUpperCase() + elementoCorrente.slice(1);
       outElem.textContent = pretty;
     }
@@ -368,7 +366,6 @@
       if (!resp.ok) throw new Error("HTTP " + resp.status);
 
       const ct = (resp.headers.get("content-type") || "").toLowerCase();
-      // Se il server manda testo/html, lo consideriamo fallimento e andiamo in fallback
       if (!ct.includes("application/json")) throw new Error("NON_JSON");
 
       return await resp.json();
@@ -411,7 +408,6 @@
     if (!("speechSynthesis" in window)) return false;
 
     try{
-      // su mobile serve una “gesture” reale: questo viene chiamato dal click del bottone
       const u = new SpeechSynthesisUtterance(" ");
       u.lang = "it-IT";
       window.speechSynthesis.cancel();
@@ -424,21 +420,102 @@
     }
   }
 
+  // === VOCE NIBI: "SUSSURRO NOTTURNO" (morbida, rituale, rassicurante) ===
   function parlaTesto(testo){
     if (!("speechSynthesis" in window)) return;
     if (!voceSbloccata) return;
 
-    try{
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(testo);
-      utter.lang = "it-IT";
-      utter.rate = 1;
-      utter.pitch = 1;
-      window.speechSynthesis.speak(utter);
-    } catch(e){
-      // se il telefono blocca, non facciamo drama
-      console.warn("Sintesi vocale bloccata:", e);
+    const synth = window.speechSynthesis;
+    synth.cancel();
+
+    function pulisci(t){
+      return String(t || "")
+        .replace(/[✨🔮🌙🔥💧🌿🌕🌌]/g, "")
+        .replace(/\s+/g, " ")
+        .replace(/[:;]+/g, ". ")
+        .replace(/([,.!?])\1+/g, "$1")
+        .trim();
     }
+
+    function spezza(t){
+      const clean = pulisci(t);
+      const frasi = clean
+        .split(/(?<=[\.\!\?])\s+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const out = [];
+      for (const f of frasi){
+        if (f.length <= 170) out.push(f);
+        else{
+          let start = 0;
+          while (start < f.length){
+            out.push(f.slice(start, start + 160).trim());
+            start += 160;
+          }
+        }
+      }
+      return out;
+    }
+
+    function scegliVoce(){
+      const voci = synth.getVoices() || [];
+      const preferite = [
+        /italian.*(natural|online)/i,
+        /(elsa|silvia|chiara|julia|julie).*ital/i,
+        /google.*ital/i,
+        /(female|woman|donna)/i
+      ];
+
+      const it = voci.filter(v => (v.lang || "").toLowerCase().startsWith("it"));
+      for (const rx of preferite){
+        const found = it.find(v => rx.test(v.name));
+        if (found) return found;
+      }
+      if (it[0]) return it[0];
+
+      for (const rx of preferite){
+        const found = voci.find(v => rx.test(v.name));
+        if (found) return found;
+      }
+      return voci[0] || null;
+    }
+
+    const voceScelta = scegliVoce();
+
+    // parametri "notte"
+    const RATE_NOTTE  = 0.82;
+    const PITCH_NOTTE = 0.72;
+    const VOL_NOTTE   = 0.92;
+
+    const parti = spezza(testo);
+
+    let i = 0;
+    const parlaProssima = () => {
+      if (i >= parti.length) return;
+
+      const frase = parti[i];
+      const u = new SpeechSynthesisUtterance(frase);
+      u.lang = "it-IT";
+      u.rate = RATE_NOTTE;
+      u.pitch = PITCH_NOTTE;
+      u.volume = VOL_NOTTE;
+      if (voceScelta) u.voice = voceScelta;
+
+      u.onend = () => {
+        i++;
+        setTimeout(parlaProssima, 180);
+      };
+
+      synth.speak(u);
+    };
+
+    setTimeout(parlaProssima, 120);
+  }
+
+  // forza caricamento voci (alcuni browser le caricano dopo)
+  if ("speechSynthesis" in window){
+    window.speechSynthesis.onvoiceschanged = () => {};
   }
 
   window.chiediMessaggioNibi = async function(){
@@ -451,10 +528,8 @@
       btn.style.cursor = "wait";
     }
 
-    // (1) sblocco voce su mobile al primo click
     provaSbloccaVoce();
 
-    // (2) tentativo Cloud Run + retry leggero
     let data = null;
     const url = CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente) + "&t=" + Date.now();
 
@@ -462,14 +537,12 @@
       data = await fetchJsonConTimeout(url);
     } catch(e1){
       try{
-        // retry una volta (spesso su mobile basta)
         data = await fetchJsonConTimeout(url);
       } catch(e2){
         data = null;
       }
     }
 
-    // (3) fallback SEMPRE (mai rosso)
     if (!data){
       data = generaFallback(elementoCorrente);
       setStatus("Oggi Nibi ti parla da dentro la scultura, senza rete. ✨", "#c9d0ff");
@@ -479,13 +552,15 @@
 
     const {elemento, runa, senso, mantra, messaggio} = applicaDati(data);
 
-    // (4) voce (se il telefono la permette)
+    // testo più “rituale” (migliora la resa vocale su PC + mobile)
     const testoVocale =
+      "Ascolta... " +
+      "Respira. " +
       "Elemento: " + elemento + ". " +
       (runa !== "—" ? "Runa: " + runa + ". " : "") +
       (senso !== "—" ? "Senso: " + senso + ". " : "") +
       (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
-      "Messaggio del giorno: " + messaggio;
+      "Messaggio del giorno. " + messaggio;
 
     parlaTesto(testoVocale);
 
