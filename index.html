@@ -1,47 +1,73 @@
-<div id="nibi-nfc" style="max-width:720px;margin:28px auto;padding:22px;border-radius:22px;background:#070a18;border:1px solid rgba(255,217,119,.35);box-shadow:0 0 26px rgba(142,164,255,.18);color:#e9ecff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;">
-  <h2 style="margin:0 0 10px;text-align:center;color:#ffd977;letter-spacing:.4px;">
-    🔮 NIBI – NFC Voice Oracle
-  </h2>
-  <p style="margin:0 0 16px;text-align:center;color:#c9d0ff;">
-    Premi “Attiva NFC”, poi tocca il tag. Nibi risponde e il telefono legge a voce.
-  </p>
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NIBI – NFC Voice Oracle</title>
+</head>
+<body style="margin:0;background:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;">
 
-  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:14px 0 10px;">
-    <button id="btnStartNFC" style="cursor:pointer;border:0;border-radius:999px;padding:12px 16px;font-weight:700;
-      background:linear-gradient(90deg,#ffd977,#ffe9b5);color:#080a16;box-shadow:0 0 18px rgba(255,217,119,.35);">
-      📶 Attiva NFC
-    </button>
+  <div id="nibi-nfc" style="max-width:920px;margin:40px auto;padding:22px;">
+    <div style="max-width:720px;margin:0 auto;padding:22px;border-radius:26px;
+      background:radial-gradient(circle at top,#121a44 0,#070a18 55%,#040513 100%);
+      border:1px solid rgba(255,217,119,.28);
+      box-shadow:0 0 40px rgba(142,164,255,.16);
+      color:#e9ecff;">
 
-    <button id="btnSpeak" disabled style="cursor:pointer;border:1px solid rgba(142,164,255,.45);border-radius:999px;padding:12px 16px;font-weight:700;
-      background:radial-gradient(circle at top,#1a2150,#0b0e1a);color:#e9ecff;box-shadow:0 0 18px rgba(142,164,255,.18);opacity:.6;">
-      🔊 Parla
-    </button>
+      <h1 style="margin:0 0 8px;text-align:center;color:#ffd977;letter-spacing:.4px;">
+        🔮 NIBI – NFC Voice Oracle
+      </h1>
+      <p style="margin:0 0 18px;text-align:center;color:#c9d0ff;line-height:1.4;">
+        Premi “Attiva NFC”, poi tocca il tag. Su PC l’NFC non esiste: usa “TESTA (PC)” per provare la chiamata a Nibi.
+      </p>
 
-    <button id="btnStop" disabled style="cursor:pointer;border:1px solid rgba(255,217,119,.25);border-radius:999px;padding:12px 16px;font-weight:700;
-      background:transparent;color:#ffd977;opacity:.6;">
-      ⛔ Stop
-    </button>
-  </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0 10px;">
+        <button id="btnStartNFC" style="cursor:pointer;border:0;border-radius:999px;padding:12px 16px;font-weight:800;
+          background:linear-gradient(90deg,#ffd977,#ffe9b5);color:#080a16;box-shadow:0 0 20px rgba(255,217,119,.33);">
+          📶 Attiva NFC
+        </button>
 
-  <div id="status" style="margin:12px 0 14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#c9d0ff;">
-    Stato: pronto.
-  </div>
+        <button id="btnTestPC" style="cursor:pointer;border:1px solid rgba(142,164,255,.45);border-radius:999px;padding:12px 16px;font-weight:800;
+          background:radial-gradient(circle at top,#1a2150,#0b0e1a);color:#e9ecff;box-shadow:0 0 18px rgba(142,164,255,.16);">
+          🧪 TESTA (PC)
+        </button>
 
-  <div id="result" style="padding:16px;border-radius:16px;background:rgba(5,9,28,.92);border:1px solid rgba(142,164,255,.25);">
-    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-      <div><b style="color:#ffe9b5;">Elemento:</b> <span id="el">—</span></div>
-      <div><b style="color:#ffe9b5;">Runa:</b> <span id="ru">—</span></div>
+        <button id="btnSpeak" disabled style="cursor:pointer;border:1px solid rgba(142,164,255,.45);border-radius:999px;padding:12px 16px;font-weight:800;
+          background:transparent;color:#e9ecff;opacity:.55;">
+          🔊 Parla
+        </button>
+
+        <button id="btnStop" disabled style="cursor:pointer;border:1px solid rgba(255,217,119,.25);border-radius:999px;padding:12px 16px;font-weight:800;
+          background:transparent;color:#ffd977;opacity:.55;">
+          ⛔ Stop
+        </button>
+      </div>
+
+      <div id="status" style="margin:14px 0 14px;padding:12px 14px;border-radius:14px;
+        background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#c9d0ff;">
+        Stato: pronto.
+      </div>
+
+      <div style="padding:16px;border-radius:18px;background:rgba(5,9,28,.92);border:1px solid rgba(142,164,255,.25);">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div><b style="color:#ffe9b5;">Elemento:</b> <span id="el">—</span></div>
+          <div><b style="color:#ffe9b5;">Runa:</b> <span id="ru">—</span></div>
+        </div>
+        <div style="margin-top:10px;">
+          <b style="color:#ffe9b5;">Messaggio:</b>
+          <div id="msg" style="margin-top:6px;line-height:1.5;color:#e9ecff;">—</div>
+        </div>
+
+        <div style="margin-top:12px;color:#9fb0ff;font-size:.95rem;">
+          <b>Debug tag:</b> <span id="tagdbg">—</span>
+        </div>
+      </div>
+
+      <p style="margin:14px 0 0;text-align:center;color:#9fb0ff;font-size:.95rem;">
+        NFC via browser: <b>Android + Chrome/Edge</b>. Su PC vedrai sempre “NFC non supportato”.
+      </p>
     </div>
-    <div style="margin-top:10px;">
-      <b style="color:#ffe9b5;">Messaggio:</b>
-      <div id="msg" style="margin-top:6px;line-height:1.45;color:#e9ecff;">—</div>
-    </div>
   </div>
-
-  <p style="margin:14px 0 0;text-align:center;color:#9fb0ff;font-size:.95rem;">
-    NFC via browser: <b>Android + Chrome/Edge</b>. Su iPhone puoi usare solo il bottone “Parla”.
-  </p>
-</div>
 
 <script>
 (() => {
@@ -52,23 +78,23 @@
 
   const statusEl = $("status");
   const btnStart = $("btnStartNFC");
+  const btnTest  = $("btnTestPC");
   const btnSpeak = $("btnSpeak");
   const btnStop  = $("btnStop");
 
   const elEl = $("el");
   const ruEl = $("ru");
   const msgEl = $("msg");
+  const tagDbg = $("tagdbg");
 
   let lastTextToSpeak = "";
   let ndefReader = null;
 
-  function setStatus(t) {
-    statusEl.textContent = "Stato: " + t;
-  }
+  function setStatus(t) { statusEl.textContent = "Stato: " + t; }
 
   function enable(btn, on) {
     btn.disabled = !on;
-    btn.style.opacity = on ? "1" : ".6";
+    btn.style.opacity = on ? "1" : ".55";
   }
 
   function stopSpeaking() {
@@ -83,80 +109,102 @@
       setStatus("TTS non supportato su questo browser.");
       return;
     }
-
-    // iOS: spesso serve un gesto utente prima di parlare -> per questo c'è anche il bottone "Parla"
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "it-IT";
     u.rate = 1.0;
     u.pitch = 1.0;
-
     window.speechSynthesis.speak(u);
   }
 
   function normalizeData(data) {
-    // Supporto a nomi campi diversi (IT/EN)
     const element = data.element ?? data.elemento ?? data.Elemento ?? "—";
     const rune    = data.rune ?? data.runa ?? data.Runa ?? "—";
     const message = data.message ?? data.messaggio ?? data.Messaggio ?? "—";
     return { element, rune, message };
   }
 
-  async function callNibi(tagId) {
-    setStatus("Ho letto NFC. Chiamo NIBI…");
+  function renderResult(element, rune, message, dbg) {
+    elEl.textContent = element;
+    ruEl.textContent = rune;
+    msgEl.textContent = message;
+    tagDbg.textContent = dbg || "—";
 
-    // Provo più varianti senza sapere come hai implementato l'endpoint:
-    // 1) GET ?tag=...
-    // 2) GET /?tag=...
-    // 3) GET ?nfc=...
-    // 4) GET /?id=...
-    const tries = [
-      `${API_URL}?tag=${encodeURIComponent(tagId)}&t=${Date.now()}`,
-      `${API_URL}/?tag=${encodeURIComponent(tagId)}&t=${Date.now()}`,
-      `${API_URL}?nfc=${encodeURIComponent(tagId)}&t=${Date.now()}`,
-      `${API_URL}?id=${encodeURIComponent(tagId)}&t=${Date.now()}`
+    lastTextToSpeak = `Elemento ${element}. Runa ${rune}. Messaggio: ${message}`;
+    enable(btnSpeak, true);
+    enable(btnStop, true);
+  }
+
+  async function fetchJsonOrText(url) {
+    const r = await fetch(url, { method: "GET" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+
+    const ct = (r.headers.get("content-type") || "").toLowerCase();
+    if (ct.includes("application/json")) return await r.json();
+
+    const txt = await r.text();
+    try { return JSON.parse(txt); }
+    catch { return { message: txt }; }
+  }
+
+  async function callNibiWith(tagId, extraText) {
+    const dbg = `tagId=${tagId}${extraText ? " | payload=" + extraText : ""}`;
+
+    setStatus("Chiamo NIBI…");
+
+    // Provo varianti comuni (così non ti obbligo a cambiare Cloud Run)
+    const qs = [
+      ["tag", tagId],
+      ["nfc", tagId],
+      ["id",  tagId],
+      ["uid", tagId]
     ];
+
+    // Se dal tag leggo anche un testo/URL, lo mando come "payload"
+    const payload = extraText ? encodeURIComponent(extraText) : "";
 
     let lastErr = null;
 
-    for (const url of tries) {
-      try {
-        const r = await fetch(url, { method: "GET" });
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    for (const [k,v] of qs) {
+      const base = API_URL.replace(/\/+$/,"");
+      const urls = [
+        `${base}?${k}=${encodeURIComponent(v)}&t=${Date.now()}${payload ? `&payload=${payload}` : ""}`,
+        `${base}/?${k}=${encodeURIComponent(v)}&t=${Date.now()}${payload ? `&payload=${payload}` : ""}`
+      ];
 
-        const ct = (r.headers.get("content-type") || "").toLowerCase();
-        let data;
-
-        if (ct.includes("application/json")) {
-          data = await r.json();
-        } else {
-          // se la tua Cloud Run restituisce testo, provo a interpretarlo
-          const txt = await r.text();
-          try { data = JSON.parse(txt); }
-          catch { data = { message: txt }; }
-        }
-
-        const { element, rune, message } = normalizeData(data);
-
-        elEl.textContent = element;
-        ruEl.textContent = rune;
-        msgEl.textContent = message;
-
-        lastTextToSpeak = `Elemento ${element}. Runa ${rune}. Messaggio: ${message}`;
-        enable(btnSpeak, true);
-        enable(btnStop, true);
-
-        setStatus("Messaggio ricevuto ✅");
-        // Provo a parlare subito (Android ok). Se iOS blocca, l'utente può premere "Parla".
-        speak(lastTextToSpeak);
-        return;
-
-      } catch (e) {
-        lastErr = e;
+      for (const url of urls) {
+        try {
+          const data = await fetchJsonOrText(url);
+          const { element, rune, message } = normalizeData(data);
+          renderResult(element, rune, message, dbg);
+          setStatus("Messaggio ricevuto ✅");
+          speak(lastTextToSpeak);
+          return;
+        } catch(e) { lastErr = e; }
       }
     }
 
     console.error(lastErr);
-    setStatus("Errore: la Cloud Run non ha risposto come atteso (o CORS).");
+    setStatus("Errore: Cloud Run non risponde come atteso (o CORS).");
+    tagDbg.textContent = dbg;
+  }
+
+  function extractTextRecords(message) {
+    // Estrae eventuali record testo (se il tag ha NDEF scritto)
+    const out = [];
+    try {
+      if (!message || !message.records) return out;
+      for (const rec of message.records) {
+        // record text
+        if (rec.recordType === "text" && rec.data) {
+          out.push(rec.data);
+        }
+        // url
+        if (rec.recordType === "url" && rec.data) {
+          out.push(rec.data);
+        }
+      }
+    } catch(e) {}
+    return out.filter(Boolean).map(x => String(x));
   }
 
   async function startNFC() {
@@ -164,7 +212,6 @@
 
     if (!("NDEFReader" in window)) {
       setStatus("NFC non supportato qui. Usa Android + Chrome/Edge.");
-      enable(btnSpeak, lastTextToSpeak.length > 0);
       return;
     }
 
@@ -172,12 +219,14 @@
       ndefReader = new NDEFReader();
       await ndefReader.scan();
       setStatus("NFC attivo. Ora tocca il tag… ✨");
-
       enable(btnStop, true);
 
       ndefReader.onreading = async (event) => {
-        const tagId = event.serialNumber || "unknown-tag";
-        await callNibi(tagId);
+        const serial = event.serialNumber || "unknown-tag";
+        // Se c'è NDEF, provo a prendere anche il contenuto
+        const texts = extractTextRecords(event.message);
+        const payload = texts.length ? texts.join(" | ") : "";
+        await callNibiWith(serial, payload);
       };
 
       ndefReader.onreadingerror = () => {
@@ -190,13 +239,20 @@
     }
   }
 
-  btnStart.addEventListener("click", startNFC);
-  btnSpeak.addEventListener("click", () => speak(lastTextToSpeak));
-  btnStop.addEventListener("click", () => {
-    stopSpeaking();
-    setStatus("Fermato.");
-  });
+  // Test PC: chiama Nibi con un tag finto (così verifichi API e voce)
+  async function testPC() {
+    const fake = "PC-TEST-" + Math.floor(Math.random()*999999);
+    await callNibiWith(fake, "manual-test");
+  }
 
-  setStatus("pronto. Premi “Attiva NFC”.");
+  btnStart.addEventListener("click", startNFC);
+  btnTest.addEventListener("click", testPC);
+  btnSpeak.addEventListener("click", () => speak(lastTextToSpeak));
+  btnStop.addEventListener("click", () => { stopSpeaking(); setStatus("Fermato."); });
+
+  setStatus("pronto. Premi “Attiva NFC” (telefono) o “TESTA (PC)”.");
 })();
 </script>
+
+</body>
+</html>
