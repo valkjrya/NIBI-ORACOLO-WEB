@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <title>Nibi – Oracolo Notturno Phygital</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- anti-cache (aiuta tantissimo su mobile + NFC) -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <style>
     :root {
       --bg-deep: #050814;
@@ -15,9 +21,7 @@
       --text-soft: #c9d0ff;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -36,12 +40,7 @@
       color: #f9f4ff;
     }
 
-    #nibi-oracle-wrapper {
-      width: 100%;
-      max-width: 720px;
-      display: flex;
-      justify-content: center;
-    }
+    #nibi-oracle-wrapper { width: 100%; max-width: 720px; display: flex; justify-content: center; }
 
     .nibi-card {
       position: relative;
@@ -71,15 +70,9 @@
       filter: blur(2px);
     }
 
-    .nibi-inner {
-      position: relative;
-      z-index: 1;
-    }
+    .nibi-inner { position: relative; z-index: 1; }
 
-    .nibi-header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
+    .nibi-header { text-align: center; margin-bottom: 18px; }
 
     .nibi-eyebrow {
       font-size: 0.85rem;
@@ -103,17 +96,9 @@
       margin: 0 auto;
     }
 
-    .nibi-section-label {
-      font-size: 0.85rem;
-      color: var(--accent-gold-soft);
-      margin-bottom: 6px;
-    }
+    .nibi-section-label { font-size: 0.85rem; color: var(--accent-gold-soft); margin-bottom: 6px; }
 
-    #nibi-elementi {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    #nibi-elementi { display: flex; flex-wrap: wrap; gap: 8px; }
 
     #nibi-elementi button {
       flex: 1 1 45%;
@@ -149,28 +134,24 @@
       color: #ffd6c8;
       box-shadow: 0 0 15px rgba(255, 150, 120, 0.5);
     }
-
     #nibi-elementi button[data-elemento="acqua"] {
       border-color: rgba(164, 214, 255, 0.8);
       background: linear-gradient(135deg, #071a27, #113551);
       color: #d6f0ff;
       opacity: 0.82;
     }
-
     #nibi-elementi button[data-elemento="aria"] {
       border-color: rgba(174, 246, 176, 0.8);
       background: linear-gradient(135deg, #051b11, #14402a);
       color: #e2ffea;
       opacity: 0.82;
     }
-
     #nibi-elementi button[data-elemento="terra"] {
       border-color: rgba(240, 206, 140, 0.9);
       background: linear-gradient(135deg, #231509, #4b3113);
       color: #ffe9bd;
       opacity: 0.82;
     }
-
     #nibi-elementi button[data-elemento="spazio"] {
       border-color: rgba(176, 160, 255, 0.95);
       background: radial-gradient(circle at 15% 0%, #1e1b5a 0, #090b2d 50%, #09071b 100%);
@@ -185,20 +166,11 @@
         0 0 14px rgba(255, 233, 186, 0.9),
         0 0 30px rgba(145, 124, 255, 0.65);
     }
+    #nibi-elementi button.nibi-elemento-attivo::after { opacity: 1; }
 
-    #nibi-elementi button.nibi-elemento-attivo::after {
-      opacity: 1;
-    }
+    #nibi-selezionato-label { margin-top: 8px; font-size: 0.85rem; color: #cfd4ff; }
 
-    #nibi-selezionato-label {
-      margin-top: 8px;
-      font-size: 0.85rem;
-      color: #cfd4ff;
-    }
-
-    .nibi-center {
-      text-align: center;
-    }
+    .nibi-center { text-align: center; }
 
     #nibi-oracle-button {
       border: none;
@@ -227,17 +199,9 @@
       transform: translateX(-40%);
       transition: opacity 0.35s ease, transform 0.35s ease;
     }
+    #nibi-oracle-button:hover::before { opacity: 1; transform: translateX(30%); }
 
-    #nibi-oracle-button:hover::before {
-      opacity: 1;
-      transform: translateX(30%);
-    }
-
-    #nibi-status {
-      margin-top: 6px;
-      font-size: 0.8rem;
-      color: var(--accent-blue);
-    }
+    #nibi-status { margin-top: 6px; font-size: 0.8rem; color: var(--accent-blue); }
 
     #nibi-output {
       margin-top: 10px;
@@ -251,62 +215,28 @@
       font-size: 0.9rem;
     }
 
-    #nibi-output-title {
-      color: var(--accent-gold-soft);
-      margin-bottom: 4px;
-    }
-
-    #nibi-output p {
-      margin: 0 0 8px;
-      color: var(--text-soft);
-    }
-
-    #nibi-output ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 0.88rem;
-      color: #c9d0ff;
-    }
-
-    #nibi-output ul li {
-      margin: 1px 0;
-    }
-
-    #nibi-out-messaggio {
-      margin-top: 4px;
-      color: #e9f0ff;
-    }
-
-    .nibi-footer {
-      margin-top: 10px;
-      text-align: right;
-      font-size: 0.75rem;
-      color: #a09ad9;
-    }
+    #nibi-output-title { color: var(--accent-gold-soft); margin-bottom: 4px; }
+    #nibi-output p { margin: 0 0 8px; color: var(--text-soft); }
+    #nibi-output ul { list-style: none; padding: 0; margin: 0; font-size: 0.88rem; color: #c9d0ff; }
+    #nibi-output ul li { margin: 1px 0; }
+    #nibi-out-messaggio { margin-top: 4px; color: #e9f0ff; }
+    .nibi-footer { margin-top: 10px; text-align: right; font-size: 0.75rem; color: #a09ad9; }
 
     @media (max-width: 520px) {
-      body {
-        padding: 26px 10px;
-      }
-      .nibi-card {
-        padding: 22px 16px 24px;
-      }
-      #nibi-elementi button {
-        flex: 1 1 100%;
-      }
+      body { padding: 26px 10px; }
+      .nibi-card { padding: 22px 16px 24px; }
+      #nibi-elementi button { flex: 1 1 100%; }
     }
   </style>
 </head>
-<body>
 
+<body>
 <div id="nibi-oracle-wrapper">
   <div class="nibi-card">
     <div class="nibi-inner">
+
       <div class="nibi-header">
-        <div class="nibi-eyebrow">
-          NIBI – ORACOLO NOTTURNO PHYGITAL
-        </div>
+        <div class="nibi-eyebrow">NIBI – ORACOLO NOTTURNO PHYGITAL</div>
         <h1>Scegli il tuo Nibi e ricevi il Messaggio del Giorno</h1>
         <p>
           Avvicina il tuo telefono alla scultura Nibi o seleziona qui il tuo elemento.
@@ -316,26 +246,14 @@
       </div>
 
       <div>
-        <div class="nibi-section-label">
-          1. Seleziona il Nibi che possiedi:
-        </div>
+        <div class="nibi-section-label">1. Seleziona il Nibi che possiedi:</div>
 
         <div id="nibi-elementi">
-          <button type="button" data-elemento="fuoco" onclick="selezionaNibi(this)">
-            🔥 Nibi Rosso – Fuoco
-          </button>
-          <button type="button" data-elemento="acqua" onclick="selezionaNibi(this)">
-            💧 Nibi Bianco – Acqua
-          </button>
-          <button type="button" data-elemento="aria" onclick="selezionaNibi(this)">
-            🌿 Nibi Verde – Aria
-          </button>
-          <button type="button" data-elemento="terra" onclick="selezionaNibi(this)">
-            🌕 Nibi Giallo – Terra
-          </button>
-          <button type="button" data-elemento="spazio" onclick="selezionaNibi(this)">
-            🌌 Nibi Blu – Spazio
-          </button>
+          <button type="button" data-elemento="fuoco" onclick="selezionaNibi(this)">🔥 Nibi Rosso – Fuoco</button>
+          <button type="button" data-elemento="acqua" onclick="selezionaNibi(this)">💧 Nibi Bianco – Acqua</button>
+          <button type="button" data-elemento="aria" onclick="selezionaNibi(this)">🌿 Nibi Verde – Aria</button>
+          <button type="button" data-elemento="terra" onclick="selezionaNibi(this)">🌕 Nibi Giallo – Terra</button>
+          <button type="button" data-elemento="spazio" onclick="selezionaNibi(this)">🌌 Nibi Blu – Spazio</button>
         </div>
 
         <div id="nibi-selezionato-label">
@@ -344,21 +262,13 @@
       </div>
 
       <div class="nibi-center" style="margin:10px 0 16px;">
-        <div class="nibi-section-label">
-          2. Ricevi il responso di Nibi:
-        </div>
-        <button id="nibi-oracle-button" onclick="chiediMessaggioNibi()">
-          ✨ Dammi il Messaggio del Giorno
-        </button>
-        <div id="nibi-status">
-          In ascolto... Nibi raccoglie i frammenti di energia del momento.
-        </div>
+        <div class="nibi-section-label">2. Ricevi il responso di Nibi:</div>
+        <button id="nibi-oracle-button" onclick="chiediMessaggioNibi()">✨ Dammi il Messaggio del Giorno</button>
+        <div id="nibi-status">In ascolto... Nibi raccoglie i frammenti di energia del momento.</div>
       </div>
 
       <div id="nibi-output">
-        <div id="nibi-output-title">
-          Messaggio intuitivo di Nibi
-        </div>
+        <div id="nibi-output-title">Messaggio intuitivo di Nibi</div>
         <p>
           Quando chiedi, Nibi risponde. Dopo aver toccato la scultura o selezionato il tuo elemento,
           clicca sul pulsante per ricevere un responso unico per questo momento.
@@ -378,9 +288,7 @@
         </div>
       </div>
 
-      <div class="nibi-footer">
-        Oracolo NIBI – progetto phygital di Tina Örn 🜁 🜂 🜃 🜄 🜀
-      </div>
+      <div class="nibi-footer">Oracolo NIBI – progetto phygital di Tina Örn 🜁 🜂 🜃 🜄 🜀</div>
     </div>
   </div>
 </div>
@@ -388,15 +296,22 @@
 <script>
 (function(){
   const CLOUD_RUN_URL = "https://oracolo-nibi-web-207246221438.europe-west1.run.app";
+  const TIMEOUT_MS = 6500;
   let elementoCorrente = "fuoco";
+  let voceSbloccata = false;
+
+  function setStatus(text, color){
+    const el = document.getElementById("nibi-status");
+    if (!el) return;
+    el.textContent = text;
+    el.style.color = color || "#c9d0ff";
+  }
 
   function resetGlowButtons() {
     const buttons = document.querySelectorAll("#nibi-elementi button[data-elemento]");
     buttons.forEach(b => {
       b.classList.remove("nibi-elemento-attivo");
-      if (b.dataset.elemento !== "fuoco") {
-        b.style.opacity = "0.82";
-      }
+      if (b.dataset.elemento !== "fuoco") b.style.opacity = "0.82";
     });
   }
 
@@ -407,101 +322,177 @@
     btn.style.opacity = "1";
 
     const label = document.getElementById("nibi-selezionato-label");
-    if (label) {
-      label.innerHTML = "Nibi selezionato: <strong>" + btn.innerText.trim() + "</strong>";
-    }
+    if (label) label.innerHTML = "Nibi selezionato: <strong>" + btn.innerText.trim() + "</strong>";
 
     const outElem = document.getElementById("nibi-out-elemento");
     if (outElem) {
-      const nameParts = (btn.innerText || "").split("–");
-      const shortName = (nameParts[0] || "").trim().replace(/^[^\s]+\s/, "") || elementoCorrente;
-      outElem.textContent = shortName;
+      // Mostro “Fuoco/Acqua/Aria/Terra/Spazio” in modo stabile (no parsing fragile)
+      const pretty = elementoCorrente.charAt(0).toUpperCase() + elementoCorrente.slice(1);
+      outElem.textContent = pretty;
     }
   };
 
-  // Voce di Nibi con la sintesi vocale del telefono
-  function parlaTesto(testo) {
+  function generaFallback(elemento) {
+    const base = (elemento || "fuoco").toLowerCase();
+    const map = {
+      fuoco: { runa:"ᛃ Jera", senso:"Vista interiore", mantra:"Lascio che il fuoco trasformi ciò che non mi serve più.", segni:["Ariete","Leone","Sagittario"], msg:"Il tuo fuoco oggi chiede spazio. Non soffocarlo con i dubbi: scegli un’azione piccola ma coraggiosa e onora la tua fiamma." },
+      acqua: { runa:"ᚢ Uruz", senso:"Tattilità / Pelle", mantra:"Mi lascio attraversare dalle emozioni senza affogare in esse.", segni:["Cancro","Scorpione","Pesci"], msg:"Qualcosa si sta sciogliendo dentro di te. Non trattenere i sospesi: lascia che l’acqua porti via la stanchezza." },
+      aria:  { runa:"ᛉ Algiz", senso:"Respiro", mantra:"Ogni respiro crea spazio per una nuova possibilità.", segni:["Gemelli","Bilancia","Acquario"], msg:"La mente corre, ma oggi hai il permesso di rallentare. Un respiro profondo può cambiare la forma dei pensieri." },
+      terra: { runa:"ᛃ Jera", senso:"Olfatto / Radici", mantra:"Sono radicata nel presente, anche quando tutto cambia.", segni:["Toro","Vergine","Capricorno"], msg:"Le tue radici cercano un terreno più fertile. Nutriti con gesti semplici, concreti, gentili verso il tuo corpo." },
+      spazio:{ runa:"ᛈ Perthro", senso:"Sesto senso", mantra:"Mi fido dei segni sottili che l’Universo mi manda.", segni:["Tutti i segni"], msg:"Una coincidenza ti sta parlando. Nota il dettaglio che si ripete: numero, parola, simbolo. È un messaggio per te." }
+    };
+    const d = map[base] || map.fuoco;
+    return {
+      elemento: base,
+      runa: d.runa,
+      senso: d.senso,
+      mantra: d.mantra,
+      segni_zodiacali: d.segni,
+      messaggio: d.msg
+    };
+  }
+
+  async function fetchJsonConTimeout(url){
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    try{
+      const resp = await fetch(url, {
+        method: "GET",
+        mode: "cors",
+        cache: "no-store",
+        signal: controller.signal,
+        headers: { "Accept": "application/json" }
+      });
+
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+
+      const ct = (resp.headers.get("content-type") || "").toLowerCase();
+      // Se il server manda testo/html, lo consideriamo fallimento e andiamo in fallback
+      if (!ct.includes("application/json")) throw new Error("NON_JSON");
+
+      return await resp.json();
+    } finally {
+      clearTimeout(t);
+    }
+  }
+
+  function applicaDati(data){
+    const elemento = (data.elemento || elementoCorrente || "fuoco").toString().toLowerCase();
+    const runa = data.runa || data.runa_principale || "—";
+    const senso = data.senso || "—";
+    const mantra = data.mantra || "—";
+
+    const segni = Array.isArray(data.segni_zodiacali)
+      ? data.segni_zodiacali.join(", ")
+      : (data.segni_zodiacali || "—");
+
+    const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta.";
+
+    const outElem = document.getElementById("nibi-out-elemento");
+    const outRuna = document.getElementById("nibi-out-runa");
+    const outSenso = document.getElementById("nibi-out-senso");
+    const outMantra = document.getElementById("nibi-out-mantra");
+    const outSegni = document.getElementById("nibi-out-segni");
+    const outMsg = document.getElementById("nibi-out-messaggio");
+
+    if (outElem) outElem.textContent = elemento.charAt(0).toUpperCase() + elemento.slice(1);
+    if (outRuna) outRuna.textContent = runa;
+    if (outSenso) outSenso.textContent = senso;
+    if (outMantra) outMantra.textContent = mantra;
+    if (outSegni) outSegni.textContent = segni;
+    if (outMsg) outMsg.textContent = messaggio;
+
+    return {elemento, runa, senso, mantra, segni, messaggio};
+  }
+
+  function provaSbloccaVoce(){
+    if (voceSbloccata) return true;
+    if (!("speechSynthesis" in window)) return false;
+
+    try{
+      // su mobile serve una “gesture” reale: questo viene chiamato dal click del bottone
+      const u = new SpeechSynthesisUtterance(" ");
+      u.lang = "it-IT";
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+      window.speechSynthesis.cancel();
+      voceSbloccata = true;
+      return true;
+    } catch(e){
+      return false;
+    }
+  }
+
+  function parlaTesto(testo){
     if (!("speechSynthesis" in window)) return;
-    try {
+    if (!voceSbloccata) return;
+
+    try{
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(testo);
       utter.lang = "it-IT";
       utter.rate = 1;
       utter.pitch = 1;
       window.speechSynthesis.speak(utter);
-    } catch (e) {
-      console.warn("Problema con la sintesi vocale:", e);
+    } catch(e){
+      // se il telefono blocca, non facciamo drama
+      console.warn("Sintesi vocale bloccata:", e);
     }
   }
 
-  window.chiediMessaggioNibi = async function() {
-    const statusEl = document.getElementById("nibi-status");
+  window.chiediMessaggioNibi = async function(){
     const btn = document.getElementById("nibi-oracle-button");
 
-    if (statusEl) {
-      statusEl.textContent = "Nibi sta raccogliendo frammenti di futuro... ✨";
-      statusEl.style.color = "#ffe9ba";
-    }
-    if (btn) {
+    setStatus("Nibi sta raccogliendo frammenti di futuro... ✨", "#ffe9ba");
+    if (btn){
       btn.disabled = true;
       btn.style.opacity = "0.7";
       btn.style.cursor = "wait";
     }
 
-    try {
-      const resp = await fetch(CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente));
-      if (!resp.ok) throw new Error("Risposta non valida dal server");
-      const data = await resp.json();
+    // (1) sblocco voce su mobile al primo click
+    provaSbloccaVoce();
 
-      const elemento = data.elemento || elementoCorrente;
-      const runa = data.runa || data.runa_principale || "—";
-      const senso = data.senso || "—";
-      const mantra = data.mantra || "—";
-      const segni = Array.isArray(data.segni_zodiacali)
-        ? data.segni_zodiacali.join(", ")
-        : (data.segni_zodiacali || "—");
-      const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta. Ascolta cosa vibra nel tuo corpo dopo questa domanda.";
+    // (2) tentativo Cloud Run + retry leggero
+    let data = null;
+    const url = CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente) + "&t=" + Date.now();
 
-      const outElem = document.getElementById("nibi-out-elemento");
-      const outRuna = document.getElementById("nibi-out-runa");
-      const outSenso = document.getElementById("nibi-out-senso");
-      const outMantra = document.getElementById("nibi-out-mantra");
-      const outSegni = document.getElementById("nibi-out-segni");
-      const outMsg = document.getElementById("nibi-out-messaggio");
-
-      if (outElem) outElem.textContent = elemento.charAt(0).toUpperCase() + elemento.slice(1);
-      if (outRuna) outRuna.textContent = runa;
-      if (outSenso) outSenso.textContent = senso;
-      if (outMantra) outMantra.textContent = mantra;
-      if (outSegni) outSegni.textContent = segni;
-      if (outMsg) outMsg.textContent = messaggio;
-
-      if (statusEl) {
-        statusEl.textContent = "Messaggio ricevuto. Se vuoi, ascolta la voce di Nibi o torna domani per un nuovo responso.";
-        statusEl.style.color = "#c9d0ff";
+    try{
+      data = await fetchJsonConTimeout(url);
+    } catch(e1){
+      try{
+        // retry una volta (spesso su mobile basta)
+        data = await fetchJsonConTimeout(url);
+      } catch(e2){
+        data = null;
       }
+    }
 
-      const testoVocale =
-        "Elemento: " + elemento + ". " +
-        (runa !== "—" ? "Runa: " + runa + ". " : "") +
-        (senso !== "—" ? "Senso: " + senso + ". " : "") +
-        (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
-        "Messaggio del giorno: " + messaggio;
+    // (3) fallback SEMPRE (mai rosso)
+    if (!data){
+      data = generaFallback(elementoCorrente);
+      setStatus("Oggi Nibi ti parla da dentro la scultura, senza rete. ✨", "#c9d0ff");
+    } else {
+      setStatus("Messaggio ricevuto. ✨", "#c9d0ff");
+    }
 
-      parlaTesto(testoVocale);
+    const {elemento, runa, senso, mantra, messaggio} = applicaDati(data);
 
-    } catch (err) {
-      console.error(err);
-      if (statusEl) {
-        statusEl.textContent = "Non riesco a contattare Nibi in questo momento. Riprova tra poco.";
-        statusEl.style.color = "#ff8a8a";
-      }
-    } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
-      }
+    // (4) voce (se il telefono la permette)
+    const testoVocale =
+      "Elemento: " + elemento + ". " +
+      (runa !== "—" ? "Runa: " + runa + ". " : "") +
+      (senso !== "—" ? "Senso: " + senso + ". " : "") +
+      (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
+      "Messaggio del giorno: " + messaggio;
+
+    parlaTesto(testoVocale);
+
+    if (btn){
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     }
   };
 
