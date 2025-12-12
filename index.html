@@ -1,256 +1,574 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NIBI – NFC Voice Oracle</title>
+  <meta charset="UTF-8" />
+  <title>Nibi – Oracolo Notturno Phygital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-deep: #050814;
+      --bg-card: rgba(5, 9, 28, 0.96);
+      --accent-gold: #ffd977;
+      --accent-gold-soft: #ffe9b5;
+      --accent-blue: #8ea4ff;
+      --accent-violet: #9b7dff;
+      --text-soft: #c9d0ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 16px;
+      background:
+        radial-gradient(circle at 10% 0%, #263686 0, transparent 48%),
+        radial-gradient(circle at 85% 10%, #5a2b85 0, transparent 55%),
+        radial-gradient(circle at 50% 120%, #10203f 0, transparent 65%),
+        #020308;
+      color: #f9f4ff;
+    }
+
+    #nibi-oracle-wrapper {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .nibi-card {
+      position: relative;
+      width: 100%;
+      background: radial-gradient(circle at 10% 0%, rgba(255, 230, 180, 0.12) 0, transparent 50%),
+                  radial-gradient(circle at 100% 120%, rgba(140, 160, 255, 0.16) 0, transparent 60%),
+                  var(--bg-card);
+      border-radius: 26px;
+      padding: 28px 24px 30px;
+      border: 1px solid rgba(185, 154, 255, 0.8);
+      box-shadow:
+        0 0 35px rgba(0, 0, 0, 0.75),
+        0 0 55px rgba(152, 118, 255, 0.45),
+        0 0 40px rgba(255, 220, 160, 0.25);
+      overflow: hidden;
+    }
+
+    .nibi-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(255, 215, 140, 0.24) 0, transparent 45%),
+        radial-gradient(circle at 90% 120%, rgba(118, 176, 255, 0.22) 0, transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      filter: blur(2px);
+    }
+
+    .nibi-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .nibi-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .nibi-eyebrow {
+      font-size: 0.85rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent-gold-soft);
+      margin-bottom: 4px;
+    }
+
+    .nibi-header h1 {
+      font-size: 1.7rem;
+      margin: 4px 0 6px;
+      color: #fefaf5;
+      text-shadow: 0 0 14px rgba(255, 230, 190, 0.55);
+    }
+
+    .nibi-header p {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .nibi-section-label {
+      font-size: 0.85rem;
+      color: var(--accent-gold-soft);
+      margin-bottom: 6px;
+    }
+
+    #nibi-elementi {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #nibi-elementi button {
+      flex: 1 1 45%;
+      min-width: 120px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-width: 1px;
+      border-style: solid;
+      transition: box-shadow 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #nibi-elementi button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.12) 0, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+    }
+
+    #nibi-elementi button[data-elemento="fuoco"] {
+      border-color: rgba(255, 144, 120, 0.8);
+      background: linear-gradient(135deg, #2a1412, #5f201b);
+      color: #ffd6c8;
+      box-shadow: 0 0 15px rgba(255, 150, 120, 0.5);
+    }
+
+    #nibi-elementi button[data-elemento="acqua"] {
+      border-color: rgba(164, 214, 255, 0.8);
+      background: linear-gradient(135deg, #071a27, #113551);
+      color: #d6f0ff;
+      opacity: 0.82;
+    }
+
+    #nibi-elementi button[data-elemento="aria"] {
+      border-color: rgba(174, 246, 176, 0.8);
+      background: linear-gradient(135deg, #051b11, #14402a);
+      color: #e2ffea;
+      opacity: 0.82;
+    }
+
+    #nibi-elementi button[data-elemento="terra"] {
+      border-color: rgba(240, 206, 140, 0.9);
+      background: linear-gradient(135deg, #231509, #4b3113);
+      color: #ffe9bd;
+      opacity: 0.82;
+    }
+
+    #nibi-elementi button[data-elemento="spazio"] {
+      border-color: rgba(176, 160, 255, 0.95);
+      background: radial-gradient(circle at 15% 0%, #1e1b5a 0, #090b2d 50%, #09071b 100%);
+      color: #e2ddff;
+      flex: 1 1 100%;
+      opacity: 0.82;
+    }
+
+    #nibi-elementi button.nibi-elemento-attivo {
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 14px rgba(255, 233, 186, 0.9),
+        0 0 30px rgba(145, 124, 255, 0.65);
+    }
+
+    #nibi-elementi button.nibi-elemento-attivo::after {
+      opacity: 1;
+    }
+
+    #nibi-selezionato-label {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #cfd4ff;
+    }
+
+    .nibi-center {
+      text-align: center;
+    }
+
+    #nibi-oracle-button {
+      border: none;
+      border-radius: 999px;
+      padding: 11px 28px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #1a1230;
+      background: radial-gradient(circle at 20% 0%, #fff6cf 0, #ffd773 32%, #f3b64f 68%, #b98035 100%);
+      box-shadow:
+        0 0 22px rgba(255, 220, 153, 0.95),
+        0 0 40px rgba(150, 128, 255, 0.85);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #nibi-oracle-button::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.45) 0, transparent 55%);
+      opacity: 0;
+      transform: translateX(-40%);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    #nibi-oracle-button:hover::before {
+      opacity: 1;
+      transform: translateX(30%);
+    }
+
+    #nibi-status {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--accent-blue);
+    }
+
+    #nibi-output {
+      margin-top: 10px;
+      padding: 14px 14px 16px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 0% 0%, rgba(255, 233, 186, 0.06) 0, transparent 55%),
+                  radial-gradient(circle at 100% 100%, rgba(154, 132, 255, 0.1) 0, transparent 60%),
+                  linear-gradient(145deg, rgba(11, 16, 40, 0.96), rgba(4, 8, 22, 0.98));
+      border: 1px solid rgba(121, 103, 255, 0.8);
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.6) inset;
+      font-size: 0.9rem;
+    }
+
+    #nibi-output-title {
+      color: var(--accent-gold-soft);
+      margin-bottom: 4px;
+    }
+
+    #nibi-output p {
+      margin: 0 0 8px;
+      color: var(--text-soft);
+    }
+
+    #nibi-output ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.88rem;
+      color: #c9d0ff;
+    }
+
+    #nibi-output ul li {
+      margin: 1px 0;
+    }
+
+    #nibi-out-messaggio {
+      margin-top: 4px;
+      color: #e9f0ff;
+    }
+
+    .nibi-footer {
+      margin-top: 10px;
+      text-align: right;
+      font-size: 0.75rem;
+      color: #a09ad9;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 26px 10px;
+      }
+      .nibi-card {
+        padding: 22px 16px 24px;
+      }
+      #nibi-elementi button {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
 </head>
-<body style="margin:0;background:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;">
+<body>
 
-  <div id="nibi-nfc" style="max-width:920px;margin:40px auto;padding:22px;">
-    <div style="max-width:720px;margin:0 auto;padding:22px;border-radius:26px;
-      background:radial-gradient(circle at top,#121a44 0,#070a18 55%,#040513 100%);
-      border:1px solid rgba(255,217,119,.28);
-      box-shadow:0 0 40px rgba(142,164,255,.16);
-      color:#e9ecff;">
-
-      <h1 style="margin:0 0 8px;text-align:center;color:#ffd977;letter-spacing:.4px;">
-        🔮 NIBI – NFC Voice Oracle
-      </h1>
-      <p style="margin:0 0 18px;text-align:center;color:#c9d0ff;line-height:1.4;">
-        Premi “Attiva NFC”, poi tocca il tag. Su PC l’NFC non esiste: usa “TESTA (PC)” per provare la chiamata a Nibi.
-      </p>
-
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0 10px;">
-        <button id="btnStartNFC" style="cursor:pointer;border:0;border-radius:999px;padding:12px 16px;font-weight:800;
-          background:linear-gradient(90deg,#ffd977,#ffe9b5);color:#080a16;box-shadow:0 0 20px rgba(255,217,119,.33);">
-          📶 Attiva NFC
-        </button>
-
-        <button id="btnTestPC" style="cursor:pointer;border:1px solid rgba(142,164,255,.45);border-radius:999px;padding:12px 16px;font-weight:800;
-          background:radial-gradient(circle at top,#1a2150,#0b0e1a);color:#e9ecff;box-shadow:0 0 18px rgba(142,164,255,.16);">
-          🧪 TESTA (PC)
-        </button>
-
-        <button id="btnSpeak" disabled style="cursor:pointer;border:1px solid rgba(142,164,255,.45);border-radius:999px;padding:12px 16px;font-weight:800;
-          background:transparent;color:#e9ecff;opacity:.55;">
-          🔊 Parla
-        </button>
-
-        <button id="btnStop" disabled style="cursor:pointer;border:1px solid rgba(255,217,119,.25);border-radius:999px;padding:12px 16px;font-weight:800;
-          background:transparent;color:#ffd977;opacity:.55;">
-          ⛔ Stop
-        </button>
+<div id="nibi-oracle-wrapper">
+  <div class="nibi-card">
+    <div class="nibi-inner">
+      <div class="nibi-header">
+        <div class="nibi-eyebrow">
+          NIBI – ORACOLO NOTTURNO PHYGITAL
+        </div>
+        <h1>Scegli il tuo Nibi e ricevi il Messaggio del Giorno</h1>
+        <p>
+          Avvicina il tuo telefono alla scultura Nibi o seleziona qui il tuo elemento.
+          Clicca su <strong>“Dammi il Messaggio del Giorno”</strong> per ricevere un responso intuitivo
+          con runa, senso, mantra e segni collegati. Se il tuo telefono lo supporta, Nibi ti parlerà anche a voce.
+        </p>
       </div>
 
-      <div id="status" style="margin:14px 0 14px;padding:12px 14px;border-radius:14px;
-        background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#c9d0ff;">
-        Stato: pronto.
-      </div>
-
-      <div style="padding:16px;border-radius:18px;background:rgba(5,9,28,.92);border:1px solid rgba(142,164,255,.25);">
-        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-          <div><b style="color:#ffe9b5;">Elemento:</b> <span id="el">—</span></div>
-          <div><b style="color:#ffe9b5;">Runa:</b> <span id="ru">—</span></div>
-        </div>
-        <div style="margin-top:10px;">
-          <b style="color:#ffe9b5;">Messaggio:</b>
-          <div id="msg" style="margin-top:6px;line-height:1.5;color:#e9ecff;">—</div>
+      <div>
+        <div class="nibi-section-label">
+          1. Seleziona il Nibi che possiedi:
         </div>
 
-        <div style="margin-top:12px;color:#9fb0ff;font-size:.95rem;">
-          <b>Debug tag:</b> <span id="tagdbg">—</span>
+        <div id="nibi-elementi">
+          <button type="button" data-elemento="fuoco" onclick="selezionaNibi(this)">
+            🔥 Nibi Rosso – Fuoco
+          </button>
+          <button type="button" data-elemento="acqua" onclick="selezionaNibi(this)">
+            💧 Nibi Bianco – Acqua
+          </button>
+          <button type="button" data-elemento="aria" onclick="selezionaNibi(this)">
+            🌿 Nibi Verde – Aria
+          </button>
+          <button type="button" data-elemento="terra" onclick="selezionaNibi(this)">
+            🌕 Nibi Giallo – Terra
+          </button>
+          <button type="button" data-elemento="spazio" onclick="selezionaNibi(this)">
+            🌌 Nibi Blu – Spazio
+          </button>
+        </div>
+
+        <div id="nibi-selezionato-label">
+          Nibi selezionato: <strong>Rosso – Fuoco</strong>
         </div>
       </div>
 
-      <p style="margin:14px 0 0;text-align:center;color:#9fb0ff;font-size:.95rem;">
-        NFC via browser: <b>Android + Chrome/Edge</b>. Su PC vedrai sempre “NFC non supportato”.
-      </p>
+      <div class="nibi-center" style="margin:10px 0 16px;">
+        <div class="nibi-section-label">
+          2. Ricevi il responso di Nibi:
+        </div>
+        <button id="nibi-oracle-button" onclick="chiediMessaggioNibi()">
+          ✨ Dammi il Messaggio del Giorno
+        </button>
+        <div id="nibi-status">
+          In ascolto... Nibi raccoglie i frammenti di energia del momento.
+        </div>
+      </div>
+
+      <div id="nibi-output">
+        <div id="nibi-output-title">
+          Messaggio intuitivo di Nibi
+        </div>
+        <p>
+          Quando chiedi, Nibi risponde. Dopo aver toccato la scultura o selezionato il tuo elemento,
+          clicca sul pulsante per ricevere un responso unico per questo momento.
+        </p>
+        <ul>
+          <li><strong>Elemento:</strong> <span id="nibi-out-elemento">Fuoco</span></li>
+          <li><strong>Runa:</strong> <span id="nibi-out-runa">—</span></li>
+          <li><strong>Senso:</strong> <span id="nibi-out-senso">—</span></li>
+          <li><strong>Mantra:</strong> <span id="nibi-out-mantra">—</span></li>
+          <li><strong>Segni zodiacali:</strong> <span id="nibi-out-segni">—</span></li>
+        </ul>
+        <div style="margin-top:8px;">
+          <strong>Messaggio del giorno:</strong>
+          <div id="nibi-out-messaggio">
+            Inizia respirando profondamente. Lascia che il tuo Nibi ti trovi, invece di cercare tu la risposta.
+          </div>
+        </div>
+      </div>
+
+      <div class="nibi-footer">
+        Oracolo NIBI – progetto phygital di Tina Örn 🜁 🜂 🜃 🜄 🜀
+      </div>
     </div>
   </div>
+</div>
 
 <script>
-(() => {
-  // ✅ La tua Cloud Run
-  const API_URL = "https://oracolo-nibi-web-207246221438.europe-west1.run.app";
+(function(){
+  // URL del backend Cloud Run (JSON)
+  const CLOUD_RUN_URL = "https://oracolo-nibi-web-207246221438.europe-west1.run.app";
+  let elementoCorrente = "fuoco";
 
-  const $ = (id) => document.getElementById(id);
-
-  const statusEl = $("status");
-  const btnStart = $("btnStartNFC");
-  const btnTest  = $("btnTestPC");
-  const btnSpeak = $("btnSpeak");
-  const btnStop  = $("btnStop");
-
-  const elEl = $("el");
-  const ruEl = $("ru");
-  const msgEl = $("msg");
-  const tagDbg = $("tagdbg");
-
-  let lastTextToSpeak = "";
-  let ndefReader = null;
-
-  function setStatus(t) { statusEl.textContent = "Stato: " + t; }
-
-  function enable(btn, on) {
-    btn.disabled = !on;
-    btn.style.opacity = on ? "1" : ".55";
+  function resetGlowButtons() {
+    const buttons = document.querySelectorAll("#nibi-elementi button[data-elemento]");
+    buttons.forEach(b => {
+      b.classList.remove("nibi-elemento-attivo");
+      if (b.dataset.elemento !== "fuoco") {
+        b.style.opacity = "0.82";
+      }
+    });
   }
 
-  function stopSpeaking() {
-    try { window.speechSynthesis.cancel(); } catch(e) {}
+  window.selezionaNibi = function(btn) {
+    resetGlowButtons();
+    elementoCorrente = btn.dataset.elemento || "fuoco";
+    btn.classList.add("nibi-elemento-attivo");
+    btn.style.opacity = "1";
+
+    const label = document.getElementById("nibi-selezionato-label");
+    if (label) {
+      label.innerHTML = "Nibi selezionato: <strong>" + btn.innerText.trim() + "</strong>";
+    }
+
+    const outElem = document.getElementById("nibi-out-elemento");
+    if (outElem) {
+      const nameParts = (btn.innerText || "").split("–");
+      const shortName = (nameParts[0] || "").trim().replace(/^[^\s]+\s/, "") || elementoCorrente;
+      outElem.textContent = shortName;
+    }
+  };
+
+  // Fallback locale se Cloud Run non risponde
+  function generaFallback(elemento) {
+    const base = (elemento || "fuoco").toLowerCase();
+    const map = {
+      fuoco: {
+        runa: "ᛃ Jera",
+        senso: "Vista interiore",
+        mantra: "Lascio che il fuoco trasformi ciò che non mi serve più.",
+        segni: "Ariete, Leone, Sagittario",
+        msg: "Il tuo fuoco oggi chiede spazio. Non soffocarlo con i dubbi: scegli un’azione piccola ma coraggiosa e onora la tua fiamma."
+      },
+      acqua: {
+        runa: "ᚢ Uruz",
+        senso: "Tattilità / Pelle",
+        mantra: "Mi lascio attraversare dalle emozioni senza affogare in esse.",
+        segni: "Cancro, Scorpione, Pesci",
+        msg: "Qualcosa si sta sciogliendo dentro di te. Non trattenere le lacrime, i sospiri, i sospesi: lascia che l’acqua porti via la stanchezza."
+      },
+      aria: {
+        runa: "ᛉ Algiz",
+        senso: "Respiro",
+        mantra: "Ogni respiro crea spazio per una nuova possibilità.",
+        segni: "Gemelli, Bilancia, Acquario",
+        msg: "La mente corre, ma oggi hai il permesso di rallentare. Un respiro profondo può cambiare la forma dei pensieri."
+      },
+      terra: {
+        runa: "ᛃ Jera",
+        senso: "Olfatto / Radici",
+        mantra: "Sono radicata nel presente, anche quando tutto cambia.",
+        segni: "Toro, Vergine, Capricorno",
+        msg: "Le tue radici stanno cercando un terreno più fertile. Nutriti con gesti semplici, concreti, gentili verso il tuo corpo."
+      },
+      spazio: {
+        runa: "ᛈ Perthro",
+        senso: "Sesto senso",
+        mantra: "Mi fido dei segni sottili che l’Universo mi manda.",
+        segni: "Tutti i segni",
+        msg: "Una coincidenza ti sta parlando. Oggi nota il dettaglio che si ripete: numero, parola, simbolo. È un messaggio per te."
+      }
+    };
+    const d = map[base] || map.fuoco;
+    return {
+      elemento: base.charAt(0).toUpperCase() + base.slice(1),
+      runa: d.runa,
+      senso: d.senso,
+      mantra: d.mantra,
+      segni_zodiacali: d.segni,
+      messaggio: d.msg
+    };
   }
 
-  function speak(text) {
-    stopSpeaking();
-    if (!text) return;
-
+  // Funzione per far parlare Nibi usando la voce del telefono
+  function parlaTesto(testo) {
     if (!("speechSynthesis" in window)) {
-      setStatus("TTS non supportato su questo browser.");
       return;
     }
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "it-IT";
-    u.rate = 1.0;
-    u.pitch = 1.0;
-    window.speechSynthesis.speak(u);
-  }
-
-  function normalizeData(data) {
-    const element = data.element ?? data.elemento ?? data.Elemento ?? "—";
-    const rune    = data.rune ?? data.runa ?? data.Runa ?? "—";
-    const message = data.message ?? data.messaggio ?? data.Messaggio ?? "—";
-    return { element, rune, message };
-  }
-
-  function renderResult(element, rune, message, dbg) {
-    elEl.textContent = element;
-    ruEl.textContent = rune;
-    msgEl.textContent = message;
-    tagDbg.textContent = dbg || "—";
-
-    lastTextToSpeak = `Elemento ${element}. Runa ${rune}. Messaggio: ${message}`;
-    enable(btnSpeak, true);
-    enable(btnStop, true);
-  }
-
-  async function fetchJsonOrText(url) {
-    const r = await fetch(url, { method: "GET" });
-    if (!r.ok) throw new Error("HTTP " + r.status);
-
-    const ct = (r.headers.get("content-type") || "").toLowerCase();
-    if (ct.includes("application/json")) return await r.json();
-
-    const txt = await r.text();
-    try { return JSON.parse(txt); }
-    catch { return { message: txt }; }
-  }
-
-  async function callNibiWith(tagId, extraText) {
-    const dbg = `tagId=${tagId}${extraText ? " | payload=" + extraText : ""}`;
-
-    setStatus("Chiamo NIBI…");
-
-    // Provo varianti comuni (così non ti obbligo a cambiare Cloud Run)
-    const qs = [
-      ["tag", tagId],
-      ["nfc", tagId],
-      ["id",  tagId],
-      ["uid", tagId]
-    ];
-
-    // Se dal tag leggo anche un testo/URL, lo mando come "payload"
-    const payload = extraText ? encodeURIComponent(extraText) : "";
-
-    let lastErr = null;
-
-    for (const [k,v] of qs) {
-      const base = API_URL.replace(/\/+$/,"");
-      const urls = [
-        `${base}?${k}=${encodeURIComponent(v)}&t=${Date.now()}${payload ? `&payload=${payload}` : ""}`,
-        `${base}/?${k}=${encodeURIComponent(v)}&t=${Date.now()}${payload ? `&payload=${payload}` : ""}`
-      ];
-
-      for (const url of urls) {
-        try {
-          const data = await fetchJsonOrText(url);
-          const { element, rune, message } = normalizeData(data);
-          renderResult(element, rune, message, dbg);
-          setStatus("Messaggio ricevuto ✅");
-          speak(lastTextToSpeak);
-          return;
-        } catch(e) { lastErr = e; }
-      }
-    }
-
-    console.error(lastErr);
-    setStatus("Errore: Cloud Run non risponde come atteso (o CORS).");
-    tagDbg.textContent = dbg;
-  }
-
-  function extractTextRecords(message) {
-    // Estrae eventuali record testo (se il tag ha NDEF scritto)
-    const out = [];
     try {
-      if (!message || !message.records) return out;
-      for (const rec of message.records) {
-        // record text
-        if (rec.recordType === "text" && rec.data) {
-          out.push(rec.data);
-        }
-        // url
-        if (rec.recordType === "url" && rec.data) {
-          out.push(rec.data);
-        }
-      }
-    } catch(e) {}
-    return out.filter(Boolean).map(x => String(x));
-  }
-
-  async function startNFC() {
-    stopSpeaking();
-
-    if (!("NDEFReader" in window)) {
-      setStatus("NFC non supportato qui. Usa Android + Chrome/Edge.");
-      return;
-    }
-
-    try {
-      ndefReader = new NDEFReader();
-      await ndefReader.scan();
-      setStatus("NFC attivo. Ora tocca il tag… ✨");
-      enable(btnStop, true);
-
-      ndefReader.onreading = async (event) => {
-        const serial = event.serialNumber || "unknown-tag";
-        // Se c'è NDEF, provo a prendere anche il contenuto
-        const texts = extractTextRecords(event.message);
-        const payload = texts.length ? texts.join(" | ") : "";
-        await callNibiWith(serial, payload);
-      };
-
-      ndefReader.onreadingerror = () => {
-        setStatus("Non riesco a leggere il tag. Riprova avvicinando il telefono.");
-      };
-
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(testo);
+      utter.lang = "it-IT";
+      utter.rate = 1;
+      utter.pitch = 1;
+      window.speechSynthesis.speak(utter);
     } catch (e) {
-      console.error(e);
-      setStatus("NFC non attivato. Serve HTTPS + permesso browser (Android/Chrome).");
+      console.warn("Problema con la sintesi vocale:", e);
     }
   }
 
-  // Test PC: chiama Nibi con un tag finto (così verifichi API e voce)
-  async function testPC() {
-    const fake = "PC-TEST-" + Math.floor(Math.random()*999999);
-    await callNibiWith(fake, "manual-test");
-  }
+  window.chiediMessaggioNibi = async function() {
+    const statusEl = document.getElementById("nibi-status");
+    const btn = document.getElementById("nibi-oracle-button");
+    if (statusEl) {
+      statusEl.textContent = "Nibi sta raccogliendo frammenti di futuro... ✨";
+      statusEl.style.color = "#ffe9ba";
+    }
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+      btn.style.cursor = "wait";
+    }
 
-  btnStart.addEventListener("click", startNFC);
-  btnTest.addEventListener("click", testPC);
-  btnSpeak.addEventListener("click", () => speak(lastTextToSpeak));
-  btnStop.addEventListener("click", () => { stopSpeaking(); setStatus("Fermato."); });
+    let data = null;
 
-  setStatus("pronto. Premi “Attiva NFC” (telefono) o “TESTA (PC)”.");
+    try {
+      const resp = await fetch(CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente));
+      if (resp.ok) {
+        data = await resp.json();
+      }
+    } catch (err) {
+      console.warn("Impossibile contattare Cloud Run, uso fallback locale.", err);
+    }
+
+    // Se Cloud Run non risponde, usiamo un messaggio locale
+    if (!data) {
+      data = generaFallback(elementoCorrente);
+      if (statusEl) {
+        statusEl.textContent = "Oggi Nibi ti parla da dentro la scultura, senza rete. ✨";
+        statusEl.style.color = "#c9d0ff";
+      }
+    } else {
+      if (statusEl) {
+        statusEl.textContent = "Messaggio ricevuto. Se vuoi, ascolta la voce di Nibi o torna domani per un nuovo responso.";
+        statusEl.style.color = "#c9d0ff";
+      }
+    }
+
+    const elemento = data.elemento || elementoCorrente;
+    const runa = data.runa || data.runa_principale || "—";
+    const senso = data.senso || "—";
+    const mantra = data.mantra || "—";
+    const segni = Array.isArray(data.segni_zodiacali)
+      ? data.segni_zodiacali.join(", ")
+      : (data.segni_zodiacali || "—");
+    const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta. Ascolta cosa vibra nel tuo corpo dopo questa domanda.";
+
+    const outElem = document.getElementById("nibi-out-elemento");
+    const outRuna = document.getElementById("nibi-out-runa");
+    const outSenso = document.getElementById("nibi-out-senso");
+    const outMantra = document.getElementById("nibi-out-mantra");
+    const outSegni = document.getElementById("nibi-out-segni");
+    const outMsg = document.getElementById("nibi-out-messaggio");
+
+    if (outElem) outElem.textContent = elemento.charAt(0).toUpperCase() + elemento.slice(1);
+    if (outRuna) outRuna.textContent = runa;
+    if (outSenso) outSenso.textContent = senso;
+    if (outMantra) outMantra.textContent = mantra;
+    if (outSegni) outSegni.textContent = segni;
+    if (outMsg) outMsg.textContent = messaggio;
+
+    const testoVocale =
+      "Elemento: " + elemento + ". " +
+      (runa !== "—" ? "Runa: " + runa + ". " : "") +
+      (senso !== "—" ? "Senso: " + senso + ". " : "") +
+      (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
+      "Messaggio del giorno: " + messaggio;
+
+    parlaTesto(testoVocale);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const first = document.querySelector("#nibi-elementi button[data-elemento='fuoco']");
+    if (first) window.selezionaNibi(first);
+  });
 })();
 </script>
 
