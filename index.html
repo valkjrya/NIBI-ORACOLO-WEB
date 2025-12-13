@@ -20,9 +20,7 @@
       --accent-violet: #9b7dff;
       --text-soft: #c9d0ff;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       padding: 0;
@@ -39,7 +37,6 @@
         #020308;
       color: #f9f4ff;
     }
-
     #nibi-oracle-wrapper { width: 100%; max-width: 720px; display: flex; justify-content: center; }
 
     .nibi-card {
@@ -57,7 +54,6 @@
         0 0 40px rgba(255, 220, 160, 0.25);
       overflow: hidden;
     }
-
     .nibi-card::before {
       content: "";
       position: absolute;
@@ -69,10 +65,8 @@
       pointer-events: none;
       filter: blur(2px);
     }
-
     .nibi-inner { position: relative; z-index: 1; }
     .nibi-header { text-align: center; margin-bottom: 18px; }
-
     .nibi-eyebrow {
       font-size: 0.85rem;
       letter-spacing: 0.24em;
@@ -80,25 +74,20 @@
       color: var(--accent-gold-soft);
       margin-bottom: 4px;
     }
-
     .nibi-header h1 {
       font-size: 1.7rem;
       margin: 4px 0 6px;
       color: #fefaf5;
       text-shadow: 0 0 14px rgba(255, 230, 190, 0.55);
     }
-
     .nibi-header p {
       font-size: 0.95rem;
       color: var(--text-soft);
       max-width: 520px;
       margin: 0 auto;
     }
-
     .nibi-section-label { font-size: 0.85rem; color: var(--accent-gold-soft); margin-bottom: 6px; }
-
     #nibi-elementi { display: flex; flex-wrap: wrap; gap: 8px; }
-
     #nibi-elementi button {
       flex: 1 1 45%;
       min-width: 120px;
@@ -116,7 +105,6 @@
       position: relative;
       overflow: hidden;
     }
-
     #nibi-elementi button::after {
       content: "";
       position: absolute;
@@ -126,7 +114,6 @@
       transition: opacity 0.18s ease;
       pointer-events: none;
     }
-
     #nibi-elementi button[data-elemento="fuoco"] {
       border-color: rgba(255, 144, 120, 0.8);
       background: linear-gradient(135deg, #2a1412, #5f201b);
@@ -158,7 +145,6 @@
       flex: 1 1 100%;
       opacity: 0.82;
     }
-
     #nibi-elementi button.nibi-elemento-attivo {
       transform: translateY(-1px);
       box-shadow:
@@ -166,9 +152,7 @@
         0 0 30px rgba(145, 124, 255, 0.65);
     }
     #nibi-elementi button.nibi-elemento-attivo::after { opacity: 1; }
-
     #nibi-selezionato-label { margin-top: 8px; font-size: 0.85rem; color: #cfd4ff; }
-
     .nibi-center { text-align: center; }
 
     #nibi-oracle-button {
@@ -188,7 +172,6 @@
       position: relative;
       overflow: hidden;
     }
-
     #nibi-oracle-button::before {
       content: "";
       position: absolute;
@@ -213,7 +196,6 @@
       box-shadow: 0 0 18px rgba(0, 0, 0, 0.6) inset;
       font-size: 0.9rem;
     }
-
     #nibi-output-title { color: var(--accent-gold-soft); margin-bottom: 4px; }
     #nibi-output p { margin: 0 0 8px; color: var(--text-soft); }
     #nibi-output ul { list-style: none; padding: 0; margin: 0; font-size: 0.88rem; color: #c9d0ff; }
@@ -294,10 +276,16 @@
 
 <script>
 (function(){
+  // Cloud Run ora risponde JSON di default (ottimo per fetch)
   const CLOUD_RUN_URL = "https://oracolo-nibi-web-207246221438.europe-west1.run.app";
   const TIMEOUT_MS = 6500;
+
   let elementoCorrente = "fuoco";
   let voceSbloccata = false;
+
+  // Cache voci
+  let voicesReady = false;
+  let cachedVoices = [];
 
   function setStatus(text, color){
     const el = document.getElementById("nibi-status");
@@ -324,20 +312,18 @@
     if (label) label.innerHTML = "Nibi selezionato: <strong>" + btn.innerText.trim() + "</strong>";
 
     const outElem = document.getElementById("nibi-out-elemento");
-    if (outElem) {
-      const pretty = elementoCorrente.charAt(0).toUpperCase() + elementoCorrente.slice(1);
-      outElem.textContent = pretty;
-    }
+    if (outElem) outElem.textContent = elementoCorrente.charAt(0).toUpperCase() + elementoCorrente.slice(1);
   };
 
+  // fallback locale (se mai servisse)
   function generaFallback(elemento) {
     const base = (elemento || "fuoco").toLowerCase();
     const map = {
-      fuoco: { runa:"ᛃ Jera", senso:"Vista interiore", mantra:"Lascio che il fuoco trasformi ciò che non mi serve più.", segni:["Ariete","Leone","Sagittario"], msg:"Il tuo fuoco oggi chiede spazio. Non soffocarlo con i dubbi: scegli un’azione piccola ma coraggiosa e onora la tua fiamma." },
-      acqua: { runa:"ᚢ Uruz", senso:"Tattilità / Pelle", mantra:"Mi lascio attraversare dalle emozioni senza affogare in esse.", segni:["Cancro","Scorpione","Pesci"], msg:"Qualcosa si sta sciogliendo dentro di te. Non trattenere i sospesi: lascia che l’acqua porti via la stanchezza." },
-      aria:  { runa:"ᛉ Algiz", senso:"Respiro", mantra:"Ogni respiro crea spazio per una nuova possibilità.", segni:["Gemelli","Bilancia","Acquario"], msg:"La mente corre, ma oggi hai il permesso di rallentare. Un respiro profondo può cambiare la forma dei pensieri." },
-      terra: { runa:"ᛃ Jera", senso:"Olfatto / Radici", mantra:"Sono radicata nel presente, anche quando tutto cambia.", segni:["Toro","Vergine","Capricorno"], msg:"Le tue radici cercano un terreno più fertile. Nutriti con gesti semplici, concreti, gentili verso il tuo corpo." },
-      spazio:{ runa:"ᛈ Perthro", senso:"Sesto senso", mantra:"Mi fido dei segni sottili che l’Universo mi manda.", segni:["Tutti i segni"], msg:"Una coincidenza ti sta parlando. Nota il dettaglio che si ripete: numero, parola, simbolo. È un messaggio per te." }
+      fuoco: { runa:"ᛃ Jera", senso:"Vista interiore", mantra:"Lascio che il fuoco trasformi ciò che non mi serve più.", segni_zodiacali:["Ariete","Leone","Sagittario"], messaggio:"Respira. Oggi il Fuoco ti chiede un gesto coraggioso, anche piccolo. Lascia che la fiamma faccia chiarezza." },
+      acqua: { runa:"ᚢ Uruz", senso:"Tattilità / Pelle", mantra:"Mi lascio attraversare dalle emozioni senza affogare in esse.", segni_zodiacali:["Cancro","Scorpione","Pesci"], messaggio:"Respira. Oggi l’Acqua scioglie la tensione e porta via il superfluo. Lascia scorrere, senza trattenere." },
+      aria:  { runa:"ᛉ Algiz", senso:"Respiro", mantra:"Ogni respiro crea spazio per una nuova possibilità.", segni_zodiacali:["Gemelli","Bilancia","Acquario"], messaggio:"Respira. Oggi l’Aria alleggerisce i pensieri e apre spazio. Una parola gentile può cambiare tutto." },
+      terra: { runa:"ᛃ Jera", senso:"Olfatto / Radici", mantra:"Sono radicata nel presente, anche quando tutto cambia.", segni_zodiacali:["Toro","Vergine","Capricorno"], messaggio:"Respira. Oggi la Terra ti radica e ti nutre. Un passo lento, e ritrovi stabilità." },
+      spazio:{ runa:"ᛈ Perthro", senso:"Sesto senso", mantra:"Mi fido dei segni sottili che l’Universo mi manda.", segni_zodiacali:["Tutti i segni"], messaggio:"Respira. Oggi lo Spazio amplia la tua visione. Nota il segno che si ripete: è una guida." }
     };
     const d = map[base] || map.fuoco;
     return {
@@ -345,15 +331,15 @@
       runa: d.runa,
       senso: d.senso,
       mantra: d.mantra,
-      segni_zodiacali: d.segni,
-      messaggio: d.msg
+      segni_zodiacali: d.segni_zodiacali,
+      messaggio: d.messaggio,
+      tts: { lang:"it-IT", rate:1.08, pitch:0.92, volume:1.0 }
     };
   }
 
   async function fetchJsonConTimeout(url){
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
     try{
       const resp = await fetch(url, {
         method: "GET",
@@ -362,12 +348,9 @@
         signal: controller.signal,
         headers: { "Accept": "application/json" }
       });
-
       if (!resp.ok) throw new Error("HTTP " + resp.status);
-
       const ct = (resp.headers.get("content-type") || "").toLowerCase();
       if (!ct.includes("application/json")) throw new Error("NON_JSON");
-
       return await resp.json();
     } finally {
       clearTimeout(t);
@@ -384,7 +367,7 @@
       ? data.segni_zodiacali.join(", ")
       : (data.segni_zodiacali || "—");
 
-    const messaggio = data.messaggio || data.testo || "Il silenzio contiene già la risposta.";
+    const messaggio = data.messaggio || data.testo || "Respira. Il silenzio contiene già la risposta.";
 
     const outElem = document.getElementById("nibi-out-elemento");
     const outRuna = document.getElementById("nibi-out-runa");
@@ -400,7 +383,42 @@
     if (outSegni) outSegni.textContent = segni;
     if (outMsg) outMsg.textContent = messaggio;
 
-    return {elemento, runa, senso, mantra, segni, messaggio};
+    return {elemento, runa, senso, mantra, segni, messaggio, tts: (data.tts || null)};
+  }
+
+  // ---- VOCE: scelta femminile IT se disponibile ----
+  function loadVoices(){
+    if (!("speechSynthesis" in window)) return [];
+    cachedVoices = window.speechSynthesis.getVoices() || [];
+    if (cachedVoices.length) voicesReady = true;
+    return cachedVoices;
+  }
+
+  function pickPreferredVoice(lang){
+    if (!voicesReady) loadVoices();
+    const voices = cachedVoices || [];
+    if (!voices.length) return null;
+
+    const targetLang = (lang || "it-IT").toLowerCase();
+
+    // 1) italiane
+    const itVoices = voices.filter(v => (v.lang || "").toLowerCase().startsWith("it"));
+    if (!itVoices.length) return voices[0] || null;
+
+    // 2) preferisci nomi "femminili" comuni (Windows/Google/Apple variano)
+    const prefer = [
+      "elsa", "silvia", "lucia", "federica", "chiara", "paola", "valentina",
+      "google italiano", "italiano (italia)", "microsoft"
+    ];
+
+    // priorità: voce italiana + match preferenze
+    for (const key of prefer){
+      const found = itVoices.find(v => (v.name || "").toLowerCase().includes(key));
+      if (found) return found;
+    }
+
+    // 3) fallback: prima voce italiana
+    return itVoices[0] || null;
   }
 
   function provaSbloccaVoce(){
@@ -408,6 +426,8 @@
     if (!("speechSynthesis" in window)) return false;
 
     try{
+      // gesto reale: chiamata dal click
+      loadVoices();
       const u = new SpeechSynthesisUtterance(" ");
       u.lang = "it-IT";
       window.speechSynthesis.cancel();
@@ -420,102 +440,50 @@
     }
   }
 
-  // === VOCE NIBI: "SUSSURRO NOTTURNO" (morbida, rituale, rassicurante) ===
-  function parlaTesto(testo){
+  function normalizzaPerVoce(t){
+    // Piccole magie per farlo suonare più “umano”
+    return (t || "")
+      .replace(/\s+/g, " ")
+      .replace(/—/g, "")
+      .replace(/[“”"]/g, "")
+      .trim();
+  }
+
+  function parlaTesto(testo, tts){
     if (!("speechSynthesis" in window)) return;
     if (!voceSbloccata) return;
 
-    const synth = window.speechSynthesis;
-    synth.cancel();
+    const lang = (tts && tts.lang) ? tts.lang : "it-IT";
+    const rate = (tts && typeof tts.rate === "number") ? tts.rate : 1.08;   // più veloce/naturale
+    const pitch = (tts && typeof tts.pitch === "number") ? tts.pitch : 0.92; // più morbido/notturno
+    const volume = (tts && typeof tts.volume === "number") ? tts.volume : 1.0;
 
-    function pulisci(t){
-      return String(t || "")
-        .replace(/[✨🔮🌙🔥💧🌿🌕🌌]/g, "")
-        .replace(/\s+/g, " ")
-        .replace(/[:;]+/g, ". ")
-        .replace(/([,.!?])\1+/g, "$1")
-        .trim();
+    try{
+      const voice = pickPreferredVoice(lang);
+
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(normalizzaPerVoce(testo));
+      utter.lang = lang;
+      utter.rate = Math.max(0.8, Math.min(1.25, rate));
+      utter.pitch = Math.max(0.7, Math.min(1.2, pitch));
+      utter.volume = Math.max(0.0, Math.min(1.0, volume));
+
+      if (voice) utter.voice = voice;
+
+      window.speechSynthesis.speak(utter);
+    } catch(e){
+      console.warn("Sintesi vocale:", e);
     }
-
-    function spezza(t){
-      const clean = pulisci(t);
-      const frasi = clean
-        .split(/(?<=[\.\!\?])\s+/)
-        .map(s => s.trim())
-        .filter(Boolean);
-
-      const out = [];
-      for (const f of frasi){
-        if (f.length <= 170) out.push(f);
-        else{
-          let start = 0;
-          while (start < f.length){
-            out.push(f.slice(start, start + 160).trim());
-            start += 160;
-          }
-        }
-      }
-      return out;
-    }
-
-    function scegliVoce(){
-      const voci = synth.getVoices() || [];
-      const preferite = [
-        /italian.*(natural|online)/i,
-        /(elsa|silvia|chiara|julia|julie).*ital/i,
-        /google.*ital/i,
-        /(female|woman|donna)/i
-      ];
-
-      const it = voci.filter(v => (v.lang || "").toLowerCase().startsWith("it"));
-      for (const rx of preferite){
-        const found = it.find(v => rx.test(v.name));
-        if (found) return found;
-      }
-      if (it[0]) return it[0];
-
-      for (const rx of preferite){
-        const found = voci.find(v => rx.test(v.name));
-        if (found) return found;
-      }
-      return voci[0] || null;
-    }
-
-    const voceScelta = scegliVoce();
-
-    // parametri "notte"
-    const RATE_NOTTE  = 0.82;
-    const PITCH_NOTTE = 0.72;
-    const VOL_NOTTE   = 0.92;
-
-    const parti = spezza(testo);
-
-    let i = 0;
-    const parlaProssima = () => {
-      if (i >= parti.length) return;
-
-      const frase = parti[i];
-      const u = new SpeechSynthesisUtterance(frase);
-      u.lang = "it-IT";
-      u.rate = RATE_NOTTE;
-      u.pitch = PITCH_NOTTE;
-      u.volume = VOL_NOTTE;
-      if (voceScelta) u.voice = voceScelta;
-
-      u.onend = () => {
-        i++;
-        setTimeout(parlaProssima, 180);
-      };
-
-      synth.speak(u);
-    };
-
-    setTimeout(parlaProssima, 120);
   }
 
-  // forza caricamento voci (alcuni browser le caricano dopo)
-  if ("speechSynthesis" in window){
-    window.speechSynthesis.onvoiceschanged = () => {};
+  // Aggiorna voci quando il browser le carica in ritardo
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      loadVoices();
+    };
+    // kick
+    setTimeout(loadVoices, 250);
+    setTimeout(loadVoices, 900);
   }
 
   window.chiediMessaggioNibi = async function(){
@@ -528,8 +496,10 @@
       btn.style.cursor = "wait";
     }
 
+    // sblocco voce su mobile
     provaSbloccaVoce();
 
+    // fetch + retry leggero
     let data = null;
     const url = CLOUD_RUN_URL + "?elemento=" + encodeURIComponent(elementoCorrente) + "&t=" + Date.now();
 
@@ -550,19 +520,18 @@
       setStatus("Messaggio ricevuto. ✨", "#c9d0ff");
     }
 
-    const {elemento, runa, senso, mantra, messaggio} = applicaDati(data);
+    const {elemento, runa, senso, mantra, messaggio, tts} = applicaDati(data);
 
-    // testo più “rituale” (migliora la resa vocale su PC + mobile)
+    // ---- TESTO VOCALE (più “sussurro notturno” ma ritmo medio) ----
+    // Nota: teniamo breve per renderlo naturale su ogni device.
     const testoVocale =
-      "Ascolta... " +
       "Respira. " +
       "Elemento: " + elemento + ". " +
-      (runa !== "—" ? "Runa: " + runa + ". " : "") +
-      (senso !== "—" ? "Senso: " + senso + ". " : "") +
-      (mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
-      "Messaggio del giorno. " + messaggio;
+      (runa && runa !== "—" ? "Runa: " + runa + ". " : "") +
+      (mantra && mantra !== "—" ? "Mantra: " + mantra + ". " : "") +
+      "Messaggio. " + messaggio;
 
-    parlaTesto(testoVocale);
+    parlaTesto(testoVocale, tts);
 
     if (btn){
       btn.disabled = false;
